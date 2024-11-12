@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <title>Seating Chart</title>
+</head>
+<body>
+    <div class="grid-background" id="gridBackground">
+    </div>
+    <div class="desk-layer" id="deskLayer">
+    </div>
+    <div class="button-layer">
+        <input type="text" id="nameClass">
+        <button onclick="saveClass()">NEW CLASS</button>
+        <br>
+        <label for="studentNum">Students:</label>
+        <input type="number" id="studentNum" name="studentNum" min="1" max="50" value="20"/>
+        <label for="columnNum">Columns:</label>
+        <input type="number" id="columnNum" name="columnNum" min="1" max="50" value="5"/>
+        
+        <div class="class-option" id="classOptions"></div>
+        
+        <label for="nameConfig">Name a new configuration:</label>
+        <br>
+        <input type="text" id="nameConfig">
+        <button onclick="saveConfig(nameConfig.value)">SAVE CONFIG</button>
+        <br>
+        <div id="configButtons"></div>
+        <button onclick="shuffleDesks()">SHUFFLE</button> <button onclick="toggleDeskAppearance()">CIRCLE</button> <button onclick="clearConfigs(-1)">CLEAR ALL</button> 
+        <br>
+        <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
+    </div>
+    <div class="timer-layer" id="timerLayer">
+        <div class="time-of-day" id="timeOfDay"></div>
+        <div class="month-year" id="monthYear"></div>
+        <button onclick="toggleTimeFullscreen()">fullscreen</button>
+    </div>
+</body>
+</html>
