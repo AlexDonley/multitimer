@@ -21,6 +21,11 @@ const timeOfDay         = document.getElementById('timeOfDay')
 const monthYear         = document.getElementById('monthYear')
 const timerDirectionBtn = document.getElementById('timerDirectionBtn')
 const timerTargetBtn    = document.getElementById('timerTargetBtn')
+const timeAmountSet     = document.getElementById('timeAmountSet')
+const timeDaySet        = document.getElementById('timeDaySet')
+const timeInput         = document.getElementById('timeInput')
+const pickHours         = document.getElementById('pickHours')
+const pickMinutes       = document.getElementById('pickMinutes')
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -413,21 +418,21 @@ function toggleDeskAppearance() {
 }
 
 function displayTime() {
-    var date = new Date;
+    const date = new Date;
     // date.setTime(result_from_Date_getTime);
 
-    var seconds = date.getSeconds();
-    var minutes = date.getMinutes();
-    var hour = date.getHours() % 12;
+    const seconds = date.getSeconds();
+    const minutes = date.getMinutes();
+    const hour = date.getHours() % 12;
 
     timeStr =   hour + ":" + 
                 appendZero(minutes.toString()) + ":" + 
                 appendZero(seconds.toString())
 
-    var weekDay = weekdays[date.getDay()].substring(0, 3)
-    var monthDay = date.getDate()
-    var month = months[date.getMonth()].substring(0, 3)
-    var year = date.getFullYear()
+    const weekDay = weekdays[date.getDay()].substring(0, 3)
+    const monthDay = date.getDate()
+    const month = months[date.getMonth()].substring(0, 3)
+    const year = date.getFullYear()
 
     timeOfDay.innerText = timeStr
     monthYear.innerText = weekDay + ", " + month + " " + monthDay + ", " + year
@@ -466,10 +471,56 @@ function toggleTimerTarget() {
     if (timerTarget == 'amount') {
         timerTarget = 'time-of-day'
         timerTargetBtn.innerText = 'time of day'
+
+        const date = new Date
+        const minutes = date.getMinutes()
+        const hours = date.getHours()
+        const buffer = 25
+        const combined = (hours * 60 + minutes + buffer) - ((hours * 60 + minutes + buffer) % 5)
+        const newMinutes = combined % 60
+        const newHours = appendZero((combined - newMinutes) / 60)
+        
+        console.log(newHours, newMinutes)
+
+        timeInput.value =   appendZero(newHours.toString()) + ':' + 
+                            appendZero(newMinutes.toString())
+
+        timeDaySet.classList.remove('hide')
+        timeAmountSet.classList.add('hide')
     } else {
         timerTarget = 'amount'
         timerTargetBtn.innerText = 'amount of time'
+
+        timeDaySet.classList.add('hide')
+        timeAmountSet.classList.remove('hide')
     }
+}
+
+function createTimer() {
+    const date = new Date
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const seconds = date.getSeconds()    
+
+    let rawSecDifference
+    let targetTime = []
+    
+    if (timerTarget == 'amount') {
+        presentRawSec = hours * 3600 + minutes * 60
+        rawSecDifference = pickHours.value * 3600 + 
+                            pickMinutes.value * 60
+
+        futureRawSec = presentRawSec + rawSecDifference
+        // console.log(presentRawSec, futureRawSec)
+
+        targetTime.push(Math.floor((futureRawSec)/3600))
+        targetTime.push((futureRawSec % 3600)/60)
+        targetTime.push(seconds)
+    } else {
+
+    }
+
+    console.log(rawSecDifference, targetTime)
 }
 
 function encloseDesks(deskElementArr) {

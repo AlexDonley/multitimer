@@ -19,7 +19,7 @@
         <label for="studentNum">Students:</label>
         <input type="number" id="studentNum" name="studentNum" min="1" max="50" value="20"/>
         <label for="columnNum">Columns:</label>
-        <input type="number" id="columnNum" name="columnNum" min="1" max="50" value="5"/>
+        <input type="number" id="columnNum" name="columnNum" min="1" max="8" value="5"/>
             <br>
         <label for="classSelect">Class:</label>
         <select name="class_names" id="classSelect" onchange="switchClass(document.getElementsByTagName('select')[0].value)">
@@ -37,11 +37,27 @@
         <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
     </div>
     <div class="timer-layer" id="timerLayer">
-        <div class="time-of-day main" id="timeOfDay"></div>
-        <div class="month-year" id="monthYear"></div>
-        <button onclick="toggleTimeFullscreen()">fullscreen</button>
-        count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">up to</button>
-        <button onclick="toggleTimerTarget()" id="timerTargetBtn">amount of time</button>
+        <div class="global-timer">
+            <div class="time-of-day main" id="timeOfDay"></div>
+            <div class="month-year" id="monthYear"></div>
+            <button onclick="toggleTimeFullscreen()">fullscreen</button> <br>
+            <div class="timer-settings" id="timerSettings">
+                count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">up to</button>
+                <button onclick="toggleTimerTarget()" id="timerTargetBtn">amount of time</button>
+                    <br>
+                <div class="time-amount-settings" id="timeAmountSet">
+                    <label for="pickHours">H:</label>
+                    <input type="number" id="pickHours" name="pickHours" min="0" max="23" value="0"/>
+                    <label for="pickMinutes">M:</label>
+                    <input type="number" id="pickMinutes" name="pickMinutes" min="0" max="23" value="5"/>
+                </div>
+                <div class="time-of-day-settings hide" id="timeDaySet">
+                    <input type="time" id="timeInput">
+                </div>
+                <button onclick="createTimer()">Create Timer</button>
+            </div>
+
+        </div>
     </div>
 </body>
 </html>
