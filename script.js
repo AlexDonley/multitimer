@@ -12,7 +12,7 @@ const deskLayer         = document.getElementById('deskLayer')
 const nameClass         = document.getElementById('nameClass')
 const studentNum        = document.getElementById('studentNum')
 const columnNum         = document.getElementById('columnNum')
-const classOptions      = document.getElementById('classOptions')
+const classSelect       = document.getElementById('classSelect')
 const nameConfig        = document.getElementById('nameConfig')
 const configButtons     = document.getElementById('configButtons')
 const dotGapSlider      = document.getElementById('dotGapSlider')
@@ -70,6 +70,9 @@ let currentClass
 let classIndex = 0
 let configIndex = 0
 
+populateClassOptions()
+switchClass(classIndex)
+
 //localStorage.setItem("desk_configs", "")
 
 function populateGridDots(n, screenW, screenH) {
@@ -123,29 +126,6 @@ update = function(){checkPixels(gap)};
 // updates the stats anytime the window is resized
 
 window.addEventListener("resize", update)
-
-function populateDesks(n, w) {
-    deskLayer.innerHTML = ''
-    
-    for (let i = 0; i < n; i++) {
-        newDesk = document.createElement('div')
-        newDesk.classList.add('desk')
-        newDesk.style.height = (2 * gap) + "px"
-        newDesk.style.width = (2 * gap) + "px"
-        newDesk.style.lineHeight = (2 * gap) + "px"
-        newDesk.style.fontSize = (2 * gap - 30) + "px"
-        newDesk.style.zIndex = -1
-        newDesk.innerText = i + 1
-
-        newDesk.style.top = (Math.floor((i) / w) * gap * 3) + gap / 2 + "px"
-        newDesk.style.left = (i % w) * gap * 3 + gap / 2 + "px"
-
-        deskLayer.append(newDesk)
-        dragInit(newDesk)
-    }
-}
-
-// populateDesks(studentCount, 5)
 
 
 // CODE SNIP PROGRAMMING DRAGGABLE ELEMENT (NOT RESIZABLE)
@@ -213,11 +193,11 @@ function saveClass() {
         currentColumnNum = columnNum.value
 
         // create default desk layout
-        populateDesks(currentStudentNum, currentColumnNum)
+        populateDesks(null, currentStudentNum, currentColumnNum)
         defaultConfig = assignConfigCoords()
 
         classDict = {
-            'class_num': currentClass,
+            'class_name': currentClass,
             'num_and_col': [currentStudentNum, currentColumnNum],
             'configs': [{
                 'name': 'default',
@@ -229,30 +209,21 @@ function saveClass() {
         allConfigs.push(classDict)
         localStorage.setItem("desk_configs", JSON.stringify(allConfigs))
 
-        populateButtons(allConfigs[configIndex].configs)
+        populateConfigButtons(configIndex)
 
-        // create radio button elements and labels
+        // create dropdown menu options
 
-        let newRadioButton = document.createElement('input')
-        newRadioButton.type = 'radio'
-        newRadioButton.value = currentClass
-        newRadioButton.id = currentClass
-        newRadioButton.name = 'class_selection'
-        newRadioButton.checked = true
-        newRadioButton.onclick = setClassIndex(currentClass)
+        let newOption = document.createElement('option')
+        newOption.value = configIndex
+        newOption.innerText = currentClass
 
-        let newLabel = document.createElement('label')
-        newLabel.for = currentClass
-        newLabel.innerText = currentClass
-
-        classOptions.append(newRadioButton)
-        classOptions.append(newLabel)
+        classSelect.append(newOption)
     }
 }
 
 function setClassIndex(str) {
     
-    for (let i=0; !(allConfigs[i].class_num == str); i++) {
+    for (let i=0; !(allConfigs[i].class_name == str); i++) {
         classIndex = i
     }
 
@@ -294,25 +265,76 @@ function saveConfig(str) {
 
         configIndex = allConfigs[classIndex].configs.length
 
-        populateButtons(allConfigs[classIndex].configs)
+        populateConfigButtons(classIndex)
 
         nameConfig.value = null
     }
 }
 
-function populateButtons(configArr) {
-    configButtons.innerHTML = ''
+function populateClassOptions() {
+    classSelect.innerHTML = ''
     
-    n = 0
-    configArr.forEach(dict => {
-        newButton = document.createElement('button')
-        newButton.setAttribute("onclick", "switchConfig(" + n + ")")
-        newButton.innerText = dict.name
+    for (let n = 0; n < allConfigs.length; n++) {
+        let newOption = document.createElement('option')
+        newOption.value = n
+        newOption.innerText = allConfigs[n].class_name
 
-        configButtons.append(newButton)
-        
-        n++
-    })
+        classSelect.append(newOption)
+    }
+}
+
+function populateDesks(n, tot, col) {
+    deskLayer.innerHTML = ''
+    let t // total
+    let w // width in columns
+
+
+    if (n) {
+        t = allConfigs[n].num_and_col[0]
+        w = allConfigs[n].num_and_col[1]
+    } else {
+        t = tot
+        w = col
+    }
+    
+    for (let i = 0; i < t; i++) {
+        newDesk = document.createElement('div')
+        newDesk.classList.add('desk')
+        newDesk.style.height = (2 * gap) + "px"
+        newDesk.style.width = (2 * gap) + "px"
+        newDesk.style.lineHeight = (2 * gap) + "px"
+        newDesk.style.fontSize = (2 * gap - 30) + "px"
+        newDesk.style.zIndex = -1
+        newDesk.innerText = i + 1
+
+        newDesk.style.top = (Math.floor((i) / w) * gap * 3) + gap / 2 + "px"
+        newDesk.style.left = (i % w) * gap * 3 + gap / 2 + "px"
+
+        deskLayer.append(newDesk)
+        dragInit(newDesk)
+    }
+}
+
+function populateConfigButtons(n) {
+    configButtons.innerHTML = ''
+    if (allConfigs[n]) {
+        let configArr = allConfigs[n].configs
+    
+        for (let i=0; i< configArr.length; i++) {
+            newButton = document.createElement('button')
+            newButton.setAttribute("onclick", "switchConfig(" + i + ")")
+            newButton.innerText = configArr[i].name
+    
+            configButtons.append(newButton)
+        }
+    }
+}
+
+function switchClass(n) {
+    classIndex = n
+    
+    populateDesks(n)
+    populateConfigButtons(n)
 }
 
 function switchConfig(n) {
@@ -322,8 +344,8 @@ function switchConfig(n) {
     i = 0
     allDesks.forEach(element => {
         
-        element.style.left = allConfigs[0].configs[configIndex].positions[i][0] + "px"
-        element.style.top  = allConfigs[0].configs[configIndex].positions[i][1] + "px"
+        element.style.left = allConfigs[classIndex].configs[configIndex].positions[i][0] + "px"
+        element.style.top  = allConfigs[classIndex].configs[configIndex].positions[i][1] + "px"
 
         i++
     })
@@ -331,10 +353,10 @@ function switchConfig(n) {
 
 function clearConfigs(int) {
     if (int < 0) {
-        allConfigs = [];
+        allConfigs[classIndex].configs = [];
         localStorage.setItem('desk_configs', allConfigs)
     }
-    populateButtons(allConfigs)
+    populateConfigButtons(0)
 }
 
 function shuffleDesks() {
