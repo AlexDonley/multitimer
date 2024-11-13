@@ -19,6 +19,8 @@ const dotGapSlider      = document.getElementById('dotGapSlider')
 const timerLayer        = document.getElementById('timerLayer')
 const timeOfDay         = document.getElementById('timeOfDay')
 const monthYear         = document.getElementById('monthYear')
+const timerDirectionBtn = document.getElementById('timerDirectionBtn')
+const timerTargetBtn    = document.getElementById('timerTargetBtn')
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -69,6 +71,9 @@ if (localStorage.getItem("desk_configs")) {
 let currentClass
 let classIndex = 0
 let configIndex = 0
+
+let timerDirection = 1
+let timerTarget = 'amount'
 
 populateClassOptions()
 switchClass(classIndex)
@@ -274,6 +279,12 @@ function saveConfig(str) {
 function populateClassOptions() {
     classSelect.innerHTML = ''
     
+    noneOption = document.createElement('option')
+    noneOption.value = null
+    noneOption.innerText = 'none'
+
+    classSelect.append(noneOption)
+
     for (let n = 0; n < allConfigs.length; n++) {
         let newOption = document.createElement('option')
         newOption.value = n
@@ -353,8 +364,8 @@ function switchConfig(n) {
 
 function clearConfigs(int) {
     if (int < 0) {
-        allConfigs[classIndex].configs = [];
-        localStorage.setItem('desk_configs', allConfigs)
+        allConfigs[classIndex].configs = [allConfigs[classIndex].configs[0]]
+        localStorage.setItem('desk_configs', JSON.stringify(allConfigs))
     }
     populateConfigButtons(0)
 }
@@ -389,7 +400,17 @@ function shuffle(arr){
     return shuffled;
 }
 
+function toggleDeskAppearance() {
+    allDesks = Array.from(document.getElementsByClassName('desk'))
 
+    allDesks.forEach(element => {
+        if (element.classList.contains('circle-mode')) {
+            element.classList.remove('circle-mode')
+        } else {
+            element.classList.add('circle-mode')
+        }
+    })
+}
 
 function displayTime() {
     var date = new Date;
@@ -403,9 +424,9 @@ function displayTime() {
                 appendZero(minutes.toString()) + ":" + 
                 appendZero(seconds.toString())
 
-    var weekDay = weekdays[date.getDay()]
+    var weekDay = weekdays[date.getDay()].substring(0, 3)
     var monthDay = date.getDate()
-    var month = months[date.getMonth()]
+    var month = months[date.getMonth()].substring(0, 3)
     var year = date.getFullYear()
 
     timeOfDay.innerText = timeStr
@@ -431,16 +452,24 @@ function toggleTimeFullscreen() {
     }
 }
 
-function toggleDeskAppearance() {
-    allDesks = Array.from(document.getElementsByClassName('desk'))
+function toggleTimerDirection() {
+    if (timerDirection === 1) {
+        timerDirection = -1
+        timerDirectionBtn.innerText = 'down from'
+    } else {
+        timerDirection = 1
+        timerDirectionBtn.innerText = 'up to'
+    }
+}
 
-    allDesks.forEach(element => {
-        if (element.classList.contains('circle-mode')) {
-            element.classList.remove('circle-mode')
-        } else {
-            element.classList.add('circle-mode')
-        }
-    })
+function toggleTimerTarget() {
+    if (timerTarget == 'amount') {
+        timerTarget = 'time-of-day'
+        timerTargetBtn.innerText = 'time of day'
+    } else {
+        timerTarget = 'amount'
+        timerTargetBtn.innerText = 'amount of time'
+    }
 }
 
 function encloseDesks(deskElementArr) {
