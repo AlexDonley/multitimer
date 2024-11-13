@@ -37,9 +37,11 @@
         <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
     </div>
     <div class="timer-layer" id="timerLayer">
-        <div class="time-of-day" id="timeOfDay"></div>
+        <div class="time-of-day main" id="timeOfDay"></div>
         <div class="month-year" id="monthYear"></div>
         <button onclick="toggleTimeFullscreen()">fullscreen</button>
+        count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">up to</button>
+        <button onclick="toggleTimerTarget()" id="timerTargetBtn">amount of time</button>
     </div>
 </body>
 </html>
