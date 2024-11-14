@@ -37,10 +37,31 @@
         <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
     </div>
     <div class="timer-layer" id="timerLayer">
-        <div class="global-timer">
+        <template timer-template>
+            <div class="timer-wrapper">
+                <button class="timer-x" timer-x>X</button> <br>
+                <div class="timer-bar-wrap">
+                    <div class="timer-start" timer-start>1:15:37</div>
+                    <div class="timer-end" timer-end>1:19:37</div>
+                </div>
+                <div class="timer-main" timer-main>5:00</div>
+                <div class="timer-buttons-wrap">
+                    <button timer-reset>reset</button>
+                    <button timer-plause>play / pause</button>
+                        <br>
+                    <button timer-fullscreen>fullscreen</button>
+                    <input type="checkbox" id="loopBox" name="timer_loop" checked />
+                    <label for="timer_loop">Loop</label>
+                    <input type="checkbox" id="loopBox" name="timer_sound" checked />
+                    <label for="timer_sound">Sound</label>
+                </div>
+            </div>
+        </template>
+        
+        <div class="global-timer" id="globalTimer">
             <div class="time-of-day main" id="timeOfDay"></div>
             <div class="month-year" id="monthYear"></div>
-            <button onclick="toggleTimeFullscreen()">fullscreen</button> <br>
+            <button onclick="toggleTimeFullscreen('globalTimer')">fullscreen</button> <br>
             <div class="timer-settings" id="timerSettings">
                 count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">up to</button>
                 <button onclick="toggleTimerTarget()" id="timerTargetBtn">amount of time</button>
@@ -56,7 +77,6 @@
                 </div>
                 <button onclick="createTimer()">Create Timer</button>
             </div>
-
         </div>
     </div>
 </body>

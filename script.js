@@ -27,6 +27,8 @@ const timeInput         = document.getElementById('timeInput')
 const pickHours         = document.getElementById('pickHours')
 const pickMinutes       = document.getElementById('pickMinutes')
 
+const timerTemplate     = document.querySelector("[timer-template]")
+
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                 'July', 'August', 'September', 'October', 'November', 'December']
@@ -79,6 +81,7 @@ let configIndex = 0
 
 let timerDirection = 1
 let timerTarget = 'amount'
+let timerCount = 0
 
 populateClassOptions()
 switchClass(classIndex)
@@ -439,6 +442,8 @@ function displayTime() {
 }
 
 function appendZero(n) {
+    n = String(n)
+    
     if (n.length < 2) {
         return "0" + n
     } else {
@@ -449,11 +454,13 @@ function appendZero(n) {
 displayTime()
 timeLoop = setInterval(displayTime, 999)
 
-function toggleTimeFullscreen() {
-    if (timerLayer.classList.contains('full-screen')) {
-        timerLayer.classList.remove('full-screen')
+function toggleTimeFullscreen(elementId) {
+    thisElement = document.getElementById(elementId)
+    
+    if (thisElement.classList.contains('full-screen')) {
+        thisElement.classList.remove('full-screen')
     } else {
-        timerLayer.classList.add('full-screen')
+        thisElement.classList.add('full-screen')
     }
 }
 
@@ -503,6 +510,7 @@ function createTimer() {
     const seconds = date.getSeconds()    
 
     let rawSecDifference
+    let futureRawSec
     let targetTime = []
     
     if (timerTarget == 'amount') {
@@ -520,7 +528,75 @@ function createTimer() {
 
     }
 
+    timerId = 'timer_' + timerCount
+
+    // newTimer = document.createElement('div')
+    // newTimer.style.position = 'fixed'
+    // square = gap * 4
+    // newTimer.style.width = square + 'px'
+    // newTimer.style.height = square + 'px'
+    // newTimer.style.borderRadius = '10px'
+    // newTimer.style.left = 0 + 'px'
+    // 
+    // newTimer.id = timerId
+
+    // deleteButton = document.createElement('button')
+    // deleteButton.setAttribute("onclick", "deleteTimer(" + timerCount + ")")
+    // deleteButton.innerText = 'X'
+
+    const newTimer = timerTemplate.content.cloneNode(true).children[0]
+    newTimer.setAttribute("id", "timer_" + timerCount)
+    newTimer.style.background = 'hsla(' + Math.floor(Math.random() *250)+',100%,75%,0.8)'
+    const xButton = newTimer.querySelector("[timer-x]")
+    xButton.setAttribute("onclick", "deleteTimer(" + timerCount + ")")
+    const timerStart = newTimer.querySelector("[timer-start]")
+    timerStart.innerText = hours % 12 + ":" + appendZero(minutes) + ":" + appendZero(seconds)
+    const timerEnd = newTimer.querySelector("[timer-end]")
+    timerEnd.innerText =    targetTime[0] % 12 + ":" +
+                            appendZero(targetTime[1]) + ":" +
+                            appendZero(targetTime[2])
+    // timerEnd.innerText =    Math.floor(futureRawSec / 3600) % 12 + ":" + 
+    //                         appendZero(Math.floor(futureRawSec / 60) % 60) + ":" +
+    //                         appendZero(seconds)
+    const timerMain = newTimer.querySelector("[timer-main]")
+    timerMain.id = rawSecDifference
+    timerMain.innerText = Math.floor(rawSecDifference / 60) + ':00'
+    const timerPlause = newTimer.querySelector("[timer-plause]")
+    timerPlause.setAttribute("onclick", "plauseTimer(" + timerCount +")")
+
+    console.log(newTimer)
+    timerCount++
+    //newTimer.append(deleteButton)
+    timerLayer.append(newTimer)
+
+    dragInit(newTimer)
     console.log(rawSecDifference, targetTime)
+}
+
+function deleteTimer(n) {
+    console.log(n)
+    thisTimer = document.getElementById("timer_" + n)
+    thisTimer.remove()
+}
+
+let newCounter
+
+function plauseTimer(n) {
+    const pickTimerMain = document.getElementById("timer_" + n).querySelector("[timer-main]")
+
+    newCounter = setInterval(() => {
+        countDown(pickTimerMain)
+    }, 999)
+}
+
+function countDown(element) {
+    timeArr = element.innerText.split(':')
+    rawSec =    parseInt(timeArr[timeArr.length - 1]) + 
+                parseInt(timeArr[timeArr.length - 2] * 60)
+    newSec = rawSec - 1
+    newStr = Math.floor(newSec/60) + ":" + appendZero(newSec % 60)
+    element.innerText = newStr
+    //console.log(timeArr, rawSec, newSec)
 }
 
 function encloseDesks(deskElementArr) {
