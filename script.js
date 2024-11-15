@@ -24,6 +24,7 @@ const timerTargetBtn    = document.getElementById('timerTargetBtn')
 const timeAmountSet     = document.getElementById('timeAmountSet')
 const timeDaySet        = document.getElementById('timeDaySet')
 const timeInput         = document.getElementById('timeInput')
+const timerName         = document.getElementById('timerName')
 const pickHours         = document.getElementById('pickHours')
 const pickMinutes       = document.getElementById('pickMinutes')
 
@@ -71,6 +72,8 @@ let viewHnum
 // }
 
 let allConfigs = []
+let timerObjects = []
+
 if (localStorage.getItem("desk_configs")) {
     allConfigs = JSON.parse(localStorage.getItem("desk_configs"))
 }
@@ -79,7 +82,7 @@ let currentClass
 let classIndex = 0
 let configIndex = 0
 
-let timerDirection = 1
+let timerDirection = -1
 let timerTarget = 'amount'
 let timerCount = 0
 
@@ -176,25 +179,112 @@ function dragInit( elemToDrag ) {
             newX = (currentMouseX - initMouseX) - ((currentMouseX - initMouseX) % gap) + ((gap + 0) / 2)
             newY = (currentMouseY - initMouseY) - ((currentMouseY - initMouseY) % gap) + ((gap + 0) / 2)
 
-            // console.log(newX, initBoxX, (newX+initBoxX))
-
-            //console.log(currentMouseX, initMouseX, newX, currentMouseY, initMouseY, newY)
             elemToDrag.style.left = (newX + initBoxX) + "px";
             elemToDrag.style.top  = (newY + initBoxY) + "px";
-            // document.onmousemove
         }
 
         // stop dragging
         document.onmouseup =()=>  {
-            
-            // console.log("mouse up")
 
             document.onmouseup = null;
             document.onmousemove = null;
             elemToDrag.style.cursor = 'grab';
+
         };
-    } // elemToDrag.onmousedown     
-} // dragInit
+    }    
+}
+
+// END OF CODE SNIP
+
+// CODE SNIP: drag and resize initialization function
+
+function dragResizeInit( elemToDrag) {
+    
+    // the required css code to resize
+    elemToDrag.style.overflow = 'auto';
+    elemToDrag.style.position = 'absolute';
+    //elemToDrag.style.resize = 'both';
+
+    elemToDrag.style.cursor = 'grab';
+
+    elemToDrag.onmousedown =(e)=> {
+
+        rect = e.target.getBoundingClientRect()
+
+        initMouseX = e.clientX
+        initMouseY = e.clientY
+        initBoxX = Math.floor((rect.x) / gap) * gap
+        initBoxY = Math.floor((rect.y) / gap) * gap
+
+        initWidth = rect.width
+        initHeight = rect.height
+    
+        // see if the mouse cursor is at lower right corner
+        // above the resize graphic, if so, set the variable
+        // [currentlyResizing] to true
+        let rectActiveElem = elemToDrag.getBoundingClientRect(),
+           x = parseInt(e.clientX - rectActiveElem.left),
+           y = parseInt(e.clientY - rectActiveElem.top),
+           rightEdge = ((elemToDrag.offsetWidth - x) < 15),
+           bottomEdge = ((elemToDrag.offsetHeight - y) < 15),
+           currentlyResizing = (rightEdge && bottomEdge);
+           
+        // if [currentlyResizing]we don't want to
+        // move [elemToDrag] we want to resize it
+        if(!currentlyResizing){
+            elemToDrag.style.cursor = 'grabbing';
+            e = (e || window.event);
+            e.preventDefault();
+            
+            // start dragging
+            document.onmousemove =(e)=> {
+                e = (e || window.event);
+                e.preventDefault();
+
+                currentMouseX = e.clientX
+                currentMouseY = e.clientY
+
+                newX = (currentMouseX - initMouseX) - ((currentMouseX - initMouseX) % gap) + ((gap + 0) / 2)
+                newY = (currentMouseY - initMouseY) - ((currentMouseY - initMouseY) % gap) + ((gap + 0) / 2)
+
+                elemToDrag.style.left = (newX + initBoxX) + "px";
+                elemToDrag.style.top  = (newY + initBoxY) + "px";
+            } 
+
+            // stop dragging
+            document.onmouseup =()=>  {
+               document.onmouseup = null;
+               document.onmousemove = null;
+               elemToDrag.style.cursor = 'grab';
+            }
+
+        } else {
+            e = (e || window.event);
+            e.preventDefault();
+
+            document.onmousemove =(e)=> {
+                e = (e || window.event);
+                e.preventDefault();
+
+                currentMouseX = e.clientX 
+                currentMouseY = e.clientY
+    
+                newWidth = (currentMouseX) - currentMouseX % gap
+                newHeight = (currentMouseY) - currentMouseY % gap
+    
+                elemToDrag.style.width  = newWidth  - (rect.x - rect.x % gap) + "px";
+                elemToDrag.style.height = newHeight - (rect.y - rect.y % gap) + "px";
+            }
+
+            document.onmouseup =()=>  {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                elemToDrag.style.cursor = 'grab';
+            }
+
+        }
+    }   
+}
 
 // END OF CODE SNIP
 
@@ -439,7 +529,82 @@ function displayTime() {
 
     timeOfDay.innerText = timeStr
     monthYear.innerText = weekDay + ", " + month + " " + monthDay + ", " + year
+
+    updateTimers(timerObjects)
 }
+
+function updateTimers(arr){
+    arr.forEach(timerDict => {
+        timerId = timerDict.timer_id
+        
+
+        const timerElem = document.getElementById("timer_" + timerId)
+
+        if (timerElem && (timerDict.sec_end - timerDict.sec_now >= 1)) {
+            const mainTime = timerElem.querySelector("[timer-main]")
+            const beginTime = timerElem.querySelector("[timer-start]")
+            const targetTime = timerElem.querySelector("[timer-end]")
+            const timerDirect = timerDict.count_direction
+    
+            if (!timerDict.active) {
+                timerDict.sec_end += 1
+            } 
+            if (timerDirection < 0 || timerDict.active) {
+                timerDict.sec_now += 1
+            } 
+            
+            beginTime.innerText = secToTimeStamp(timerDict.sec_start)[1]
+            targetTime.innerText = secToTimeStamp(timerDict.sec_end)[1]
+    
+            if (timerDirect < 0) { // create countdown display
+                mainStamp = secToTimeStamp(timerDict.sec_end - timerDict.sec_now)[1]
+            } else { // create countup display
+                mainStamp = secToTimeStamp(timerDict.sec_now - timerDict.sec_start)[1]
+            }
+            
+            mainTime.innerText = trimTimeStamp(mainStamp, timerDict.init_length)
+        }
+
+    })
+}
+
+function timeStampToSec(str) {
+    timeStampArr = str.split(':')
+
+    rawSecInt =     Number(timeStampArr[2])
+    rawSecInt +=    Number(timeStampArr[1] * 60)
+    rawSecInt +=    Number(timeStampArr[0] * 3600)
+
+    return rawSecInt
+}
+
+function secToTimeStamp(int) {
+    timeStampArr = [null, null, null]
+
+    rawSec = int % 60
+    rawMin = (int - rawSec) % 3600
+    rawHour = (int - rawMin - rawSec)
+
+    timeStampArr[2] = rawSec
+    timeStampArr[1] = rawMin / 60
+    timeStampArr[0] = rawHour / 3600
+
+    stampsAndString = [
+        timeStampArr, 
+        timeStampArr[0] % 12 + ":" + 
+        appendZero(timeStampArr[1]) + ":" + 
+        appendZero(timeStampArr[2])
+    ]
+
+    return stampsAndString
+}
+
+function trimTimeStamp(str, val) {
+    return str.substring((str.length - val), str.length)
+}
+
+console.log(timeStampToSec('09:40:53'))
+console.log(secToTimeStamp(34853))
 
 function appendZero(n) {
     n = String(n)
@@ -454,7 +619,7 @@ function appendZero(n) {
 displayTime()
 timeLoop = setInterval(displayTime, 999)
 
-function toggleTimeFullscreen(elementId) {
+function toggleFullscreen(elementId) {
     thisElement = document.getElementById(elementId)
     
     if (thisElement.classList.contains('full-screen')) {
@@ -503,74 +668,86 @@ function toggleTimerTarget() {
     }
 }
 
-function createTimer() {
+function initiateTimer() {
     const date = new Date
     const hours = date.getHours()
     const minutes = date.getMinutes()
     const seconds = date.getSeconds()    
+    const nowRawSec = timeStampToSec(hours+":"+minutes+":"+seconds)
 
     let rawSecDifference
     let futureRawSec
+    let stampLength
     let targetTime = []
+    let newTimerDict = {}
     
     if (timerTarget == 'amount') {
-        presentRawSec = hours * 3600 + minutes * 60
-        rawSecDifference = pickHours.value * 3600 + 
-                            pickMinutes.value * 60
+        rawSecDifference = timeStampToSec(pickHours.value + ":" + pickMinutes.value + ":00")
 
-        futureRawSec = presentRawSec + rawSecDifference
-        // console.log(presentRawSec, futureRawSec)
+        console.log(nowRawSec, rawSecDifference)
+        futureRawSec = nowRawSec + rawSecDifference
 
         targetTime.push(Math.floor((futureRawSec)/3600))
-        targetTime.push((futureRawSec % 3600)/60)
+        targetTime.push(Math.floor((futureRawSec % 3600)/60))
         targetTime.push(seconds)
     } else {
+        userPickTimeStamp = timeInput.value + ':00'
+        futureRawSec = timeStampToSec(userPickTimeStamp)
 
+        rawSecDifference = futureRawSec - nowRawSec
+        console.log(futureRawSec, rawSecDifference)
     }
+
+    if (rawSecDifference >= 3600) {
+        stampLength = 7
+    } else if (rawSecDifference >= 600) {
+        stampLength = 5
+    } else if (rawSecDifference >= 60) {
+        stampLength = 4
+    }
+
+    newTimerDict.timer_id = timerCount
+    newTimerDict.active = !(timerTarget == 'amount')
+    newTimerDict.loop = false
+    newTimerDict.init_length = stampLength
+    newTimerDict.count_direction = timerDirection
+    newTimerDict.sec_start = nowRawSec
+    newTimerDict.sec_end = futureRawSec
+    newTimerDict.sec_dur = rawSecDifference
+    newTimerDict.sec_now = nowRawSec
+    
+
+    timerObjects.push(newTimerDict)
 
     timerId = 'timer_' + timerCount
 
-    // newTimer = document.createElement('div')
-    // newTimer.style.position = 'fixed'
-    // square = gap * 4
-    // newTimer.style.width = square + 'px'
-    // newTimer.style.height = square + 'px'
-    // newTimer.style.borderRadius = '10px'
-    // newTimer.style.left = 0 + 'px'
-    // 
-    // newTimer.id = timerId
+    // this builds the timer from template
+    // it is called only once and populates no time values, since the updateTimers() function will take care of that
 
-    // deleteButton = document.createElement('button')
-    // deleteButton.setAttribute("onclick", "deleteTimer(" + timerCount + ")")
-    // deleteButton.innerText = 'X'
 
     const newTimer = timerTemplate.content.cloneNode(true).children[0]
+    const xButton = newTimer.querySelector("[timer-x]")
+    const timerStart = newTimer.querySelector("[timer-start]")
+    const timerPlause = newTimer.querySelector("[timer-plause]")
+    const timerReset = newTimer.querySelector("[timer-reset]")
+    const timerHead = newTimer.querySelector("[timer-header]")
+    const timerFullscreen = newTimer.querySelector("[timer-fullscreen]")
+
     newTimer.setAttribute("id", "timer_" + timerCount)
     newTimer.style.background = 'hsla(' + Math.floor(Math.random() *250)+',100%,75%,0.8)'
-    const xButton = newTimer.querySelector("[timer-x]")
     xButton.setAttribute("onclick", "deleteTimer(" + timerCount + ")")
-    const timerStart = newTimer.querySelector("[timer-start]")
     timerStart.innerText = hours % 12 + ":" + appendZero(minutes) + ":" + appendZero(seconds)
-    const timerEnd = newTimer.querySelector("[timer-end]")
-    timerEnd.innerText =    targetTime[0] % 12 + ":" +
-                            appendZero(targetTime[1]) + ":" +
-                            appendZero(targetTime[2])
-    // timerEnd.innerText =    Math.floor(futureRawSec / 3600) % 12 + ":" + 
-    //                         appendZero(Math.floor(futureRawSec / 60) % 60) + ":" +
-    //                         appendZero(seconds)
-    const timerMain = newTimer.querySelector("[timer-main]")
-    timerMain.id = rawSecDifference
-    timerMain.innerText = Math.floor(rawSecDifference / 60) + ':00'
-    const timerPlause = newTimer.querySelector("[timer-plause]")
     timerPlause.setAttribute("onclick", "plauseTimer(" + timerCount +")")
+    timerReset.setAttribute("onclick", "resetTimer(" + timerCount +")")
+    timerFullscreen.setAttribute("onclick", "toggleFullscreen('timer_" + timerCount +"')")
+    timerHead.innerText = timerName.value
 
-    console.log(newTimer)
+
     timerCount++
-    //newTimer.append(deleteButton)
     timerLayer.append(newTimer)
-
-    dragInit(newTimer)
-    console.log(rawSecDifference, targetTime)
+    dragResizeInit(newTimer)
+    
+    updateTimers(timerObjects)
 }
 
 function deleteTimer(n) {
@@ -582,11 +759,24 @@ function deleteTimer(n) {
 let newCounter
 
 function plauseTimer(n) {
-    const pickTimerMain = document.getElementById("timer_" + n).querySelector("[timer-main]")
+    timerObjects.forEach(timer => {
+        if (timer.timer_id == n) {
+            timer.active = !timer.active
+        }
+    })
+}
 
-    newCounter = setInterval(() => {
-        countDown(pickTimerMain)
-    }, 999)
+function resetTimer(n) {
+    timerObjects.forEach(timer => {
+        if (timer.timer_id == n) {
+            timer.active = false
+
+            timer.sec_start = timer.sec_now
+            timer.sec_end = timer.sec_start + timer.sec_dur
+            
+            updateTimers(timerObjects)
+        }
+    })
 }
 
 function countDown(element) {
@@ -596,7 +786,7 @@ function countDown(element) {
     newSec = rawSec - 1
     newStr = Math.floor(newSec/60) + ":" + appendZero(newSec % 60)
     element.innerText = newStr
-    //console.log(timeArr, rawSec, newSec)
+    // console.log(timeArr, rawSec, newSec)
 }
 
 function encloseDesks(deskElementArr) {

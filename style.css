@@ -3,6 +3,7 @@ body {
     background-color: white;
     margin: 0;
     font-family: arial, sans serif;
+    overflow: hidden
 }
 
 .grid-background {
@@ -47,7 +48,7 @@ body {
 
 .timer-layer {
     width: 100%;
-    height: 100%
+    height: 100%;
 }
 
 .timer-wrapper {
@@ -55,7 +56,17 @@ body {
     height: 200px;
     width:  200px;
     background: yellow;
-    border-radius: 10px
+    border-radius: 10px;
+    transition: width 0.1s, height 0.1s;
+}
+
+.timer-x {
+    position: absolute
+}
+
+.timer-header {
+    text-align: center;
+    margin-top: 10px
 }
 
 .timer-bar-wrap {
@@ -117,8 +128,8 @@ body {
     color: black;
     width: calc(100% - 100px);
     height: calc(100% - 100px);
-    bottom: 40px;
-    right: 40px;
+    top: 40px;
+    left: 40px;
 }
 
 .circle-mode {

@@ -39,10 +39,11 @@
     <div class="timer-layer" id="timerLayer">
         <template timer-template>
             <div class="timer-wrapper">
-                <button class="timer-x" timer-x>X</button> <br>
+                <button class="timer-x" timer-x>X</button> 
+                <div class="timer-header" timer-header></div>
                 <div class="timer-bar-wrap">
-                    <div class="timer-start" timer-start>1:15:37</div>
-                    <div class="timer-end" timer-end>1:19:37</div>
+                    <div class="timer-start" timer-start></div>
+                    <div class="timer-end" timer-end></div>
                 </div>
                 <div class="timer-main" timer-main>5:00</div>
                 <div class="timer-buttons-wrap">
@@ -50,9 +51,9 @@
                     <button timer-plause>play / pause</button>
                         <br>
                     <button timer-fullscreen>fullscreen</button>
-                    <input type="checkbox" id="loopBox" name="timer_loop" checked />
+                    <input type="checkbox" id="loopBox" name="timer_loop"/>
                     <label for="timer_loop">Loop</label>
-                    <input type="checkbox" id="loopBox" name="timer_sound" checked />
+                    <input type="checkbox" id="soundBox" name="timer_sound" checked />
                     <label for="timer_sound">Sound</label>
                 </div>
             </div>
@@ -61,9 +62,9 @@
         <div class="global-timer" id="globalTimer">
             <div class="time-of-day main" id="timeOfDay"></div>
             <div class="month-year" id="monthYear"></div>
-            <button onclick="toggleTimeFullscreen('globalTimer')">fullscreen</button> <br>
+            <button onclick="toggleFullscreen('globalTimer')">fullscreen</button> <br>
             <div class="timer-settings" id="timerSettings">
-                count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">up to</button>
+                count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">down from</button>
                 <button onclick="toggleTimerTarget()" id="timerTargetBtn">amount of time</button>
                     <br>
                 <div class="time-amount-settings" id="timeAmountSet">
@@ -75,7 +76,8 @@
                 <div class="time-of-day-settings hide" id="timeDaySet">
                     <input type="time" id="timeInput">
                 </div>
-                <button onclick="createTimer()">Create Timer</button>
+                <input type="text" id="timerName">
+                <button onclick="initiateTimer()">Make Timer</button>
             </div>
         </div>
     </div>
