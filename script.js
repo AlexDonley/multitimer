@@ -34,6 +34,8 @@ const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                 'July', 'August', 'September', 'October', 'November', 'December']
 
+const alarmSound  = new Audio('./sfx/alarm.mp3')
+
 const classes = {
     '201' : [
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
@@ -201,8 +203,7 @@ function dragInit( elemToDrag ) {
 function dragResizeInit(elemToDrag) {
     
     // the required css code to resize
-    elemToDrag.style.overflow = 'auto';
-    elemToDrag.style.position = 'absolute';
+    elemToDrag.style.position = 'fixed';
     //elemToDrag.style.resize = 'both';
 
     elemToDrag.style.cursor = 'grab';
@@ -216,9 +217,11 @@ function dragResizeInit(elemToDrag) {
         initBoxX = Math.floor((rect.x) / gap) * gap
         initBoxY = Math.floor((rect.y) / gap) * gap
 
-        initWidth = rect.width
-        initHeight = rect.height
-    
+        initWidth = Number(elemToDrag.style.width.replace("px", ''))
+        initHeight = Number(elemToDrag.style.height.replace("px", ''))
+
+        console.log(initHeight)
+
         // see if the mouse cursor is at lower right corner
         // above the resize graphic, if so, set the variable
         // [currentlyResizing] to true
@@ -265,19 +268,26 @@ function dragResizeInit(elemToDrag) {
             document.onmousemove =(e)=> {
                 e = (e || window.event);
                 e.preventDefault();
-
+                
                 mainText = elemToDrag.querySelector("[timer-main]")
+                buttonsText = elemToDrag.getElementsByClassName("timer-ctrl")
 
                 currentMouseX = e.clientX 
                 currentMouseY = e.clientY
-    
-                newWidth = (currentMouseX) - currentMouseX % gap
-                newHeight = (currentMouseY) - currentMouseY % gap
-    
-                elemToDrag.style.width  = Math.max(newWidth  - (rect.x - rect.x % gap), 100) + "px";
-                elemToDrag.style.height = Math.max(newHeight - (rect.y - rect.y % gap), 100) + "px";
 
-                mainText.style.fontSize = Math.min(newWidth / 4, newHeight) + "px"
+                xOffset = currentMouseX - rect.x
+                yOffset = currentMouseY - rect.y + initHeight
+
+                roundedX = xOffset - (xOffset % gap)
+                roundedY = yOffset - (yOffset % gap)
+
+                elemToDrag.style.width  = Math.max(roundedX, 100) + "px"
+                elemToDrag.style.height = Math.max(roundedY, 100) + "px"
+
+                mainText.style.fontSize = Math.min(roundedX / 4, roundedY / 1.5) + "px"
+                Array.from(buttonsText).forEach(element => {
+                    element.style.fontSize = Math.max(roundedX / 15, 20) + "px"
+                })
             }
 
             document.onmouseup =()=>  {
@@ -514,15 +524,15 @@ function toggleDeskAppearance() {
     })
 }
 
-function displayTime() {
+function displayTime(bool) {
     const date = new Date;
     // date.setTime(result_from_Date_getTime);
 
     const seconds = date.getSeconds();
     const minutes = date.getMinutes();
-    const hour = date.getHours() % 12;
+    const hour = date.getHours();
 
-    timeStr =   hour + ":" + 
+    timeStr =   hour % 12 + ":" + 
                 appendZero(minutes.toString()) + ":" + 
                 appendZero(seconds.toString())
 
@@ -533,43 +543,53 @@ function displayTime() {
 
     timeOfDay.innerText = timeStr
     monthYear.innerText = weekDay + ", " + month + " " + monthDay + ", " + year
+    
+    if (!bool) {
+        updateTimers(timerObjects)
+    }
 
-    updateTimers(timerObjects)
+    return timeStampToSec(hour + ":" + appendZero(minutes) + ":" + appendZero(seconds))
 }
 
 function updateTimers(arr){
-    arr.forEach(timerDict => {
-        timerId = timerDict.timer_id
+    if (arr.length > 0) {
+        arr.forEach(timerDict => {
+            timerId = timerDict.timer_id
+            
+            const timerElem = document.getElementById("timer_" + timerId)
+    
+            if (timerDict.sec_end - timerDict.sec_now >= 1) {
+                const mainTime = timerElem.querySelector("[timer-main]")
+                const beginTime = timerElem.querySelector("[timer-start]")
+                const targetTime = timerElem.querySelector("[timer-end]")
+                const timerDirect = timerDict.count_direction
         
+                if (!timerDict.active) {
+                    timerDict.sec_end += 1
+                } 
+                if (timerDirection < 0 || timerDict.active) {
+                    timerDict.sec_now += 1
+                } 
+                
+                beginTime.innerText = secToTimeStamp(timerDict.sec_start)[1]
+                targetTime.innerText = secToTimeStamp(timerDict.sec_end - 1)[1]
+        
+                if (timerDirect < 0) { // create countdown display
+                    mainStamp = secToTimeStamp(timerDict.sec_end - timerDict.sec_now)[1]
+                } else { // create countup display
+                    mainStamp = secToTimeStamp(timerDict.sec_now - timerDict.sec_start)[1]
+                }
+                
+                mainTime.innerText = trimTimeStamp(mainStamp, timerDict.init_length)
 
-        const timerElem = document.getElementById("timer_" + timerId)
+            } else if (timerDict.loop) {
+                
+                resetTimer(timerId)
 
-        if (timerElem && (timerDict.sec_end - timerDict.sec_now >= 1)) {
-            const mainTime = timerElem.querySelector("[timer-main]")
-            const beginTime = timerElem.querySelector("[timer-start]")
-            const targetTime = timerElem.querySelector("[timer-end]")
-            const timerDirect = timerDict.count_direction
-    
-            if (!timerDict.active) {
-                timerDict.sec_end += 1
-            } 
-            if (timerDirection < 0 || timerDict.active) {
-                timerDict.sec_now += 1
-            } 
-            
-            beginTime.innerText = secToTimeStamp(timerDict.sec_start)[1]
-            targetTime.innerText = secToTimeStamp(timerDict.sec_end)[1]
-    
-            if (timerDirect < 0) { // create countdown display
-                mainStamp = secToTimeStamp(timerDict.sec_end - timerDict.sec_now)[1]
-            } else { // create countup display
-                mainStamp = secToTimeStamp(timerDict.sec_now - timerDict.sec_start)[1]
             }
-            
-            mainTime.innerText = trimTimeStamp(mainStamp, timerDict.init_length)
-        }
-
-    })
+    
+        })
+    }
 }
 
 function timeStampToSec(str) {
@@ -735,21 +755,25 @@ function initiateTimer() {
     const newTimer          = timerTemplate.content.cloneNode(true).children[0]
     const xButton           = newTimer.querySelector("[timer-x]")
     const timerFullscreen   = newTimer.querySelector("[timer-fullscreen]")
-    const timerStart        = newTimer.querySelector("[timer-start]")
     const timerPlause       = newTimer.querySelector("[timer-plause]")
     const timerReset        = newTimer.querySelector("[timer-reset]")
     const timerHead         = newTimer.querySelector("[timer-header]")
     const timerSound        = newTimer.querySelector("[timer-sound]")
+    const timerLoop         = newTimer.querySelector("[timer-loop]")
     
 
     newTimer.setAttribute("id", "timer_" + timerCount)
+    newTimer.style.width = gap * 4
+    newTimer.style.height = gap * 4
+    newTimer.style.top = gap / 2 + "px"
+    newTimer.style.left = gap / 2 + (timerObjects.length - 1) * gap * 4 + "px"
     newTimer.style.background = 'hsla(' + Math.floor(Math.random() *250)+',100%,75%,0.8)'
     xButton.setAttribute("onclick", "deleteTimer(" + timerCount + ")")
-    timerStart.innerText = hours % 12 + ":" + appendZero(minutes) + ":" + appendZero(seconds)
     timerPlause.setAttribute("onclick", "plauseTimer(" + timerCount +")")
     timerReset.setAttribute("onclick", "resetTimer(" + timerCount +")")
     timerFullscreen.setAttribute("onclick", "toggleFullscreen('timer_" + timerCount +"')")
     timerSound.setAttribute("onclick", "toggleAlarm(" + timerCount +")")
+    timerLoop.setAttribute("onclick", "toggleLoop(" + timerCount +")")
     timerHead.innerText = timerName.value
 
 
@@ -794,11 +818,16 @@ function plauseTimer(n) {
 function resetTimer(n) {
     timerObjects.forEach(timer => {
         if (timer.timer_id == n) {
-            timer.active = false
+            if (timer.active && !timer.loop) {
+                plauseTimer(n)
+            }
 
-            timer.sec_start = timer.sec_now
+            timer.sec_start = displayTime(true)
+            timer.sec_now = timer.sec_start
             timer.sec_end = timer.sec_start + timer.sec_dur
             
+            console.log(timer.sec_start, timer.sec_dur, timer.sec_end)
+
             updateTimers(timerObjects)
         }
     })
@@ -828,6 +857,21 @@ function toggleAlarm(n) {
     } else {
         thisSoundBtn.innerText = "🔈"
         thisSoundBtn.classList.remove('flip')
+    }
+}
+
+function toggleLoop(n) {
+    timerObjects.forEach(timer => {
+        if (timer.timer_id == n) {
+            timer.loop = !timer.loop
+            newBool = timer.loop
+        }
+    })
+    thisLoopBtn = document.getElementById("timer_" + n).querySelector("[timer-loop]")
+    if (newBool) {
+        thisLoopBtn.classList.add('flip')
+    } else {
+        thisLoopBtn.classList.remove('flip')
     }
 }
 

@@ -54,11 +54,12 @@ body {
 .timer-wrapper {
     position: fixed;
     height: 200px;
-    width:  200px;
+    width: 200px;
     background: yellow;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     transition: width 0.2s, height 0.2s, top 0.2s, left 0.2s;
 }
 
@@ -103,9 +104,14 @@ body {
 .timer-end {
     text-align: right;
 }
+.timer-main-wrap {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .timer-main {
     font-weight: bold;
-    /* flex: 1; */
     font-size: 60pt;
     text-align: center;
     transition: font-size 0.2s
@@ -113,7 +119,8 @@ body {
 
 .timer-buttons-wrap {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
     padding: 10px;
     align-content: center;
     justify-content: center;
