@@ -38,12 +38,31 @@ body {
     transition: top 0.2s, left 0.2s, border-radius 0.2s;
 }
 
-.button-layer {
+.class-settings {
     background: rgb(116, 207, 156);
     padding: 20px;
-    border-radius: 10px;
+    height: 200px;
+    border-top-right-radius: 10px;
     position: fixed;
-    bottom: 0
+    bottom: 0;
+    transition: bottom 0.5s;
+}
+.class-settings.down {
+    bottom: -240px
+}
+
+.class-tab {
+    position: absolute;
+    height: calc(8vw);
+    min-width: calc(8vw + 20px);
+    top: calc(-8vw - 20px);
+    left: 0px;
+    background: lightgreen;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    text-align: center;
+    padding: 10px;
+    font-size: 8vw
 }
 
 .timer-layer {
@@ -176,7 +195,12 @@ body {
     font-size: 20pt;
 }
 .main {
-    font-size: 8vw
+    font-size: 8vw;
+}
+
+.down {
+    /* transform: translateY(100px) */
+    bottom: -125px
 }
 
 .full-screen {

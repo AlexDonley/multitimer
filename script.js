@@ -9,6 +9,7 @@
 
 const gridBackground    = document.getElementById('gridBackground')
 const deskLayer         = document.getElementById('deskLayer')
+const classSettings     = document.getElementById('classSettings')
 const nameClass         = document.getElementById('nameClass')
 const studentNum        = document.getElementById('studentNum')
 const columnNum         = document.getElementById('columnNum')
@@ -17,6 +18,7 @@ const nameConfig        = document.getElementById('nameConfig')
 const configButtons     = document.getElementById('configButtons')
 const dotGapSlider      = document.getElementById('dotGapSlider')
 const timerLayer        = document.getElementById('timerLayer')
+const globalTimer       = document.getElementById('globalTimer')
 const timeOfDay         = document.getElementById('timeOfDay')
 const monthYear         = document.getElementById('monthYear')
 const timerDirectionBtn = document.getElementById('timerDirectionBtn')
@@ -455,6 +457,7 @@ function populateConfigButtons(n) {
 
 function switchClass(n) {
     classIndex = n
+    classTab.innerText = allConfigs[n].class_name
     
     populateDesks(n)
     populateConfigButtons(n)
@@ -522,6 +525,22 @@ function toggleDeskAppearance() {
             element.classList.add('circle-mode')
         }
     })
+}
+
+function toggleGlobalTimer() {
+    if (globalTimer.classList.contains('down')) {
+        globalTimer.classList.remove('down')
+    } else {
+        globalTimer.classList.add('down')
+    }
+}
+
+function toggleClassMenu() {
+    if (classSettings.classList.contains('down')) {
+        classSettings.classList.remove('down')
+    } else {
+        classSettings.classList.add('down')
+    }
 }
 
 function displayTime(bool) {

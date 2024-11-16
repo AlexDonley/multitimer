@@ -12,7 +12,10 @@
     </div>
     <div class="desk-layer" id="deskLayer">
     </div>
-    <div class="button-layer">
+    <div class="class-settings down" id="classSettings">
+        <div class="class-tab" id="classTab" onclick="toggleClassMenu()">
+
+        </div>
         <input type="text" id="nameClass">
         <button onclick="saveClass()">NEW CLASS</button>
             <br>
@@ -60,8 +63,8 @@
             </div>
         </template>
         
-        <div class="global-timer" id="globalTimer">
-            <div class="time-of-day main" id="timeOfDay"></div>
+        <div class="global-timer down" id="globalTimer">
+            <div class="time-of-day main" id="timeOfDay" onclick="toggleGlobalTimer()"></div>
             <div class="month-year" id="monthYear"></div>
             <button onclick="toggleFullscreen('globalTimer')">fullscreen</button> <br>
             <div class="timer-settings" id="timerSettings">
