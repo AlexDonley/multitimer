@@ -39,6 +39,7 @@
     <div class="timer-layer" id="timerLayer">
         <template timer-template>
             <div class="timer-wrapper">
+                <button class="timer-fullscreen-btn" timer-fullscreen>◻</button>
                 <button class="timer-x" timer-x>X</button> 
                 <div class="timer-header" timer-header></div>
                 <div class="timer-bar-wrap">
@@ -47,14 +48,12 @@
                 </div>
                 <div class="timer-main" timer-main>5:00</div>
                 <div class="timer-buttons-wrap">
-                    <button timer-reset>reset</button>
-                    <button timer-plause>play / pause</button>
-                        <br>
-                    <button timer-fullscreen>fullscreen</button>
-                    <input type="checkbox" id="loopBox" name="timer_loop"/>
-                    <label for="timer_loop">Loop</label>
-                    <input type="checkbox" id="soundBox" name="timer_sound" checked />
-                    <label for="timer_sound">Sound</label>
+                    <button class="timer-ctrl" timer-reset>⟲</button>
+                    <button class="timer-ctrl timer-plause-btn" timer-plause>►</button>
+                    <button class="timer-ctrl sub-timer-btn" timer-sub>Sub by:</button>
+                    <button class="timer-ctrl" timer-loop>∞</button>
+                    <button class="timer-ctrl flip" timer-sound>🔊</button>                    
+                    <input class="timer-ctrl" type="number" id="subDivide" name="sub_divide" min="2" max="8" value="2"/>
                 </div>
             </div>
         </template>

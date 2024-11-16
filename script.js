@@ -198,7 +198,7 @@ function dragInit( elemToDrag ) {
 
 // CODE SNIP: drag and resize initialization function
 
-function dragResizeInit( elemToDrag) {
+function dragResizeInit(elemToDrag) {
     
     // the required css code to resize
     elemToDrag.style.overflow = 'auto';
@@ -266,14 +266,18 @@ function dragResizeInit( elemToDrag) {
                 e = (e || window.event);
                 e.preventDefault();
 
+                mainText = elemToDrag.querySelector("[timer-main]")
+
                 currentMouseX = e.clientX 
                 currentMouseY = e.clientY
     
                 newWidth = (currentMouseX) - currentMouseX % gap
                 newHeight = (currentMouseY) - currentMouseY % gap
     
-                elemToDrag.style.width  = newWidth  - (rect.x - rect.x % gap) + "px";
-                elemToDrag.style.height = newHeight - (rect.y - rect.y % gap) + "px";
+                elemToDrag.style.width  = Math.max(newWidth  - (rect.x - rect.x % gap), 100) + "px";
+                elemToDrag.style.height = Math.max(newHeight - (rect.y - rect.y % gap), 100) + "px";
+
+                mainText.style.fontSize = Math.min(newWidth / 4, newHeight) + "px"
             }
 
             document.onmouseup =()=>  {
@@ -698,7 +702,9 @@ function initiateTimer() {
         console.log(futureRawSec, rawSecDifference)
     }
 
-    if (rawSecDifference >= 3600) {
+    if (rawSecDifference >= 36000) {
+        stampLength = 8
+    } else if (rawSecDifference >= 3600) {
         stampLength = 7
     } else if (rawSecDifference >= 600) {
         stampLength = 5
@@ -711,6 +717,7 @@ function initiateTimer() {
     newTimerDict.loop = false
     newTimerDict.init_length = stampLength
     newTimerDict.count_direction = timerDirection
+    newTimerDict.alarm = true
     newTimerDict.sec_start = nowRawSec
     newTimerDict.sec_end = futureRawSec
     newTimerDict.sec_dur = rawSecDifference
@@ -725,13 +732,15 @@ function initiateTimer() {
     // it is called only once and populates no time values, since the updateTimers() function will take care of that
 
 
-    const newTimer = timerTemplate.content.cloneNode(true).children[0]
-    const xButton = newTimer.querySelector("[timer-x]")
-    const timerStart = newTimer.querySelector("[timer-start]")
-    const timerPlause = newTimer.querySelector("[timer-plause]")
-    const timerReset = newTimer.querySelector("[timer-reset]")
-    const timerHead = newTimer.querySelector("[timer-header]")
-    const timerFullscreen = newTimer.querySelector("[timer-fullscreen]")
+    const newTimer          = timerTemplate.content.cloneNode(true).children[0]
+    const xButton           = newTimer.querySelector("[timer-x]")
+    const timerFullscreen   = newTimer.querySelector("[timer-fullscreen]")
+    const timerStart        = newTimer.querySelector("[timer-start]")
+    const timerPlause       = newTimer.querySelector("[timer-plause]")
+    const timerReset        = newTimer.querySelector("[timer-reset]")
+    const timerHead         = newTimer.querySelector("[timer-header]")
+    const timerSound        = newTimer.querySelector("[timer-sound]")
+    
 
     newTimer.setAttribute("id", "timer_" + timerCount)
     newTimer.style.background = 'hsla(' + Math.floor(Math.random() *250)+',100%,75%,0.8)'
@@ -740,6 +749,7 @@ function initiateTimer() {
     timerPlause.setAttribute("onclick", "plauseTimer(" + timerCount +")")
     timerReset.setAttribute("onclick", "resetTimer(" + timerCount +")")
     timerFullscreen.setAttribute("onclick", "toggleFullscreen('timer_" + timerCount +"')")
+    timerSound.setAttribute("onclick", "toggleAlarm(" + timerCount +")")
     timerHead.innerText = timerName.value
 
 
@@ -754,16 +764,31 @@ function deleteTimer(n) {
     console.log(n)
     thisTimer = document.getElementById("timer_" + n)
     thisTimer.remove()
+
+    for (let i=0; i<timerObjects.length; i++) {
+        if (timerObjects[i].timer_id == n) {
+            timerObjects.splice(i, 1)
+        }
+    }
 }
 
 let newCounter
 
 function plauseTimer(n) {
+    let newBool
+
     timerObjects.forEach(timer => {
         if (timer.timer_id == n) {
             timer.active = !timer.active
+            newBool = timer.active
         }
     })
+    thisPlayBtn = document.getElementById("timer_" + n).querySelector("[timer-plause]")
+    if (newBool) {
+        thisPlayBtn.innerText = "⏸︎"
+    } else {
+        thisPlayBtn.innerText = "►"
+    }
 }
 
 function resetTimer(n) {
@@ -787,6 +812,23 @@ function countDown(element) {
     newStr = Math.floor(newSec/60) + ":" + appendZero(newSec % 60)
     element.innerText = newStr
     // console.log(timeArr, rawSec, newSec)
+}
+
+function toggleAlarm(n) {
+    timerObjects.forEach(timer => {
+        if (timer.timer_id == n) {
+            timer.alarm = !timer.alarm
+            newBool = timer.alarm
+        }
+    })
+    thisSoundBtn = document.getElementById("timer_" + n).querySelector("[timer-sound]")
+    if (newBool) {
+        thisSoundBtn.innerText = "🔊"
+        thisSoundBtn.classList.add('flip')
+    } else {
+        thisSoundBtn.innerText = "🔈"
+        thisSoundBtn.classList.remove('flip')
+    }
 }
 
 function encloseDesks(deskElementArr) {
