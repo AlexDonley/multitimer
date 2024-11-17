@@ -14,30 +14,51 @@
     </div>
     <div class="class-settings down" id="classSettings">
         <div class="class-tab" id="classTab" onclick="toggleClassMenu()">
-
+            Class
         </div>
-        <input type="text" id="nameClass">
-        <button onclick="saveClass()">NEW CLASS</button>
-            <br>
-        <label for="studentNum">Students:</label>
-        <input type="number" id="studentNum" name="studentNum" min="1" max="50" value="20"/>
-        <label for="columnNum">Columns:</label>
-        <input type="number" id="columnNum" name="columnNum" min="1" max="8" value="5"/>
-            <br>
-        <label for="classSelect">Class:</label>
-        <select name="class_names" id="classSelect" onchange="switchClass(document.getElementsByTagName('select')[0].value)">
-          <option value="">none</option>
-        </select>
-            <br>
-        <label for="nameConfig">Name a new configuration:</label>
-            <br>
-        <input type="text" id="nameConfig">
-        <button onclick="saveConfig(nameConfig.value)">SAVE CONFIG</button>
-            <br>
-        <div id="configButtons"></div>
-        <button onclick="shuffleDesks()">SHUFFLE</button> <button onclick="toggleDeskAppearance()">CIRCLE</button> <button onclick="clearConfigs(-1)">CLEAR ALL</button> 
-            <br>
-        <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
+        <div class="class-no-tab">
+            <div class="class-scroll-menu" id="classScrollMenu">
+                <div class="save-class-wrap">
+                    <label for="classSelect">Pick a class:</label>
+                    <select name="class_names" id="classSelect" onchange="switchClass(document.getElementsByTagName('select')[0].value)">
+                        <option value="">none</option>
+                    </select>
+                        <br>
+                    <div> or save a new class:</div>
+                        <br>
+                    <div class="studs-cols-wrap">
+                        <label for="studentNum">Students:</label>
+                        <label for="columnNum">Columns:</label>
+                        <input type="number" id="studentNum" name="studentNum" min="1" max="50" value="20"/>
+                        <input type="number" id="columnNum" name="columnNum" min="1" max="8" value="5"/>
+                    </div>
+                    <input type="text" id="nameClass">
+                    <button onclick="saveClass()">SAVE CLASS</button>
+                </div>
+                <div class="save-config-wrap">
+                    <div>
+                        Drag desks to configure them.
+                    </div>
+                    <label for="nameConfig">Name and save below:</label>
+                        <br>
+                    <input type="text" id="nameConfig">
+                    <button onclick="saveConfig(nameConfig.value)">SAVE CONFIG</button>
+                        <br>
+                    <div id="configButtons"></div>
+                    <button onclick="shuffleDesks()">SHUFFLE</button> <button onclick="toggleDeskAppearance()">CIRCLE</button> <button onclick="clearConfigs(-1)">CLEAR ALL</button> 
+                </div>
+                <div class="class-info-wrap">
+                    To be created: means of saving student numbers and names to local storage
+                </div>
+            </div>
+            <div class="class-bottom-controls">
+                <div class="class-buttons-wrap">
+                    <button onclick="shiftClassMenu(-1)">◀</button>
+                    <button onclick="shiftClassMenu(1)">▶</button>
+                </div>
+                <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
+            </div>
+        </div>
     </div>
     <div class="timer-layer" id="timerLayer">
         <template timer-template>

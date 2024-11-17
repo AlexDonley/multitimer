@@ -10,6 +10,7 @@
 const gridBackground    = document.getElementById('gridBackground')
 const deskLayer         = document.getElementById('deskLayer')
 const classSettings     = document.getElementById('classSettings')
+const classScrollMenu   = document.getElementById('classScrollMenu')
 const nameClass         = document.getElementById('nameClass')
 const studentNum        = document.getElementById('studentNum')
 const columnNum         = document.getElementById('columnNum')
@@ -90,8 +91,19 @@ let timerDirection = -1
 let timerTarget = 'amount'
 let timerCount = 0
 
+let classMenuPos = 0
+
+function shiftClassMenu(n) {
+    if (classMenuPos + n > -1 && classMenuPos + n < 3) {
+        classMenuPos += n
+        classScrollMenu.style.transform = "translateX(" + classMenuPos * -240 + "px)"
+    }
+}
+
 populateClassOptions()
-switchClass(classIndex)
+if (allConfigs[classIndex]) {
+    switchClass(classIndex)
+}
 
 //localStorage.setItem("desk_configs", "")
 
