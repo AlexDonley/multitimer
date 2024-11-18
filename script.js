@@ -104,6 +104,10 @@ if (allConfigs[classIndex]) {
     populateClassButtons()
 }
 
+function writeConfigsToLocal() {
+    localStorage.setItem("desk_configs", JSON.stringify(allConfigs))
+}
+
 //localStorage.setItem("desk_configs", "")
 
 function populateGridDots(n, screenW, screenH) {
@@ -317,33 +321,68 @@ function dragResizeInit(elemToDrag) {
 
 function saveClass() {
     if (nameClass.value) {
+        
+        let existingIndex = null
+
+        for (let n=0; n < allConfigs.length; n++) {
+            if (allConfigs[n].class_name == nameClass.value) {
+                existingIndex = n
+            }
+        }
+        
         // grab class name, total studen number, and column number from inputs
         currentClass = nameClass.value.toString()
         currentStudentNum = studentNum.value
         currentColumnNum = columnNum.value
 
-        // create default desk layout
-        populateDesks(null, currentStudentNum, currentColumnNum)
-        defaultConfig = assignConfigCoords()
+        if (existingIndex) {
 
-        classDict = {
-            'class_name': currentClass,
-            'num_and_col': [currentStudentNum, currentColumnNum],
-            'configs': [{
-                'name': 'default',
-                'positions': defaultConfig
-            }]
+            overwriteBool = window.confirm('That class name already exists. Would you like to overwrite it?')
+
+            if (overwriteBool) {
+
+                // create default desk layout
+                populateDesks(null, currentStudentNum, currentColumnNum)
+                defaultConfig = assignConfigCoords()
+
+                classDict = {
+                    'class_name': currentClass,
+                    'num_and_col': [currentStudentNum, currentColumnNum],
+                    'configs': [{
+                        'name': 'default',
+                        'positions': defaultConfig
+                    }]
+                }
+
+                allConfigs[existingIndex] = classDict
+                writeConfigsToLocal()
+                populateClassButtons()
+                switchClass(nameClass.value)
+
+            } 
+
+        } else {
+
+            // create default desk layout
+            populateDesks(null, currentStudentNum, currentColumnNum)
+            defaultConfig = assignConfigCoords()
+                
+            classDict = {
+                'class_name': currentClass,
+                'num_and_col': [currentStudentNum, currentColumnNum],
+                'configs': [{
+                    'name': 'default',
+                    'positions': defaultConfig
+                }]
+            }
+
+            allConfigs.push(classDict)
+            writeConfigsToLocal()
+            populateClassButtons()
+            switchClass(nameClass.value)
+
         }
-        console.log(classDict)
-
-        allConfigs.push(classDict)
-        localStorage.setItem("desk_configs", JSON.stringify(allConfigs))
-
-        populateClassButtons()
-        populateConfigButtons(allConfigs[thisIndex].class_name)
-
-        shiftClassMenu(1)
-        nameClass.value = ''
+        nameClass.value = ''       
     }
 }
 
@@ -377,22 +416,38 @@ function saveConfig(str) {
         // check to see if config name is already in use
         // if so, give user the option to overwrite or cancel
 
+        let existingIndex = null
 
-
-        // here is the option to write / overwrite
+        for (let n=0; n < allConfigs[classIndex].configs.length; n++) {
+            if (allConfigs[classIndex].configs[n].name == str) {
+                existingIndex = n
+            }
+        }
 
         configObj = {}
-
         configObj.name = str
         configObj.positions = assignConfigCoords()
 
-        allConfigs[classIndex].configs.push(configObj)
-        localStorage.setItem("desk_configs", JSON.stringify(allConfigs))
+        if (existingIndex) {
 
-        configIndex = allConfigs[classIndex].configs.length
+            overwriteBool = window.confirm('That configuration name already exists. Would you like to overwrite it?')
 
+            if (overwriteBool) {
+
+                allConfigs[classIndex].configs[existingIndex] = configObj
+                configIndex = existingIndex
+
+            } 
+
+        } else {
+
+            allConfigs[classIndex].configs.push(configObj)
+            configIndex = allConfigs[classIndex].configs.length
+
+        }
+
+        writeConfigsToLocal()
         populateConfigButtons(allConfigs[classIndex].class_name)
-
         nameConfig.value = null
     }
 }
@@ -454,6 +509,8 @@ function populateClassButtons() {
 
         classButtons.append(newDiv)
     }
+
+    configIndex = 0
 }
 
 function switchClass(classStr) {
@@ -462,6 +519,8 @@ function switchClass(classStr) {
     for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
         thisIndex ++
     }
+
+    classIndex = thisIndex
 
     classTab.innerText = classStr
     populateDesks(thisIndex)
@@ -475,6 +534,10 @@ function deleteClass(classStr) {
 
     for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
         thisIndex ++
+    }
+
+    if(thisIndex < classIndex) {
+        classIndex--
     }
     
     allConfigs.splice(thisIndex, 1)
@@ -505,7 +568,7 @@ function populateConfigButtons(classStr) {
             newButton.classList += 'med-btn left-btn'
 
             miniDelete = document.createElement('button')
-            miniDelete.setAttribute("onclick", "deleteConfig('" + classStr + "', '" + configArr[i].name + "')")
+            miniDelete.setAttribute("onclick", "deleteConfig('" + classStr + "', '" + i + "')")
             miniDelete.classList += 'mini-btn right-btn'
             miniDelete.innerText = "X"
 
@@ -530,6 +593,8 @@ function switchConfig(classStr, configStr) {
         conIndex ++
     }
 
+    configIndex = conIndex
+
     i = 0
     allDesks.forEach(element => {
         
@@ -540,9 +605,21 @@ function switchConfig(classStr, configStr) {
     })
 }
 
-function deleteConfig(classNum, configNum) {
-    allConfigs[classNum].configs.splice(configNum, 1)
+function deleteConfig(classStr, configNum) {
+    let gradeIndex = 0
+
+    for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
+        gradeIndex ++
+    }
+
+    if (gradeIndex < configIndex) {
+        configIndex--
+    }
+    
+    allConfigs[gradeIndex].configs.splice(configNum, 1)
     configButtons.children[configNum].remove()
+
+    localStorage.setItem('desk_configs', JSON.stringify(allConfigs))
 }
 
 function clearConfigs(int) {

@@ -55,9 +55,9 @@ body {
 
 .class-tab {
     position: absolute;
-    height: calc(8vw);
+    height: min(8vh, 8vw);
     min-width: calc(min(8vh, 8vw) + 20px);
-    top: calc(-8vw - 20px);
+    top: calc(max(-8vh, -8vw) - 20px);
     left: 0px;
     background: lightgreen;
     border-top-right-radius: 10px;
@@ -95,6 +95,20 @@ body {
 .two-grid-col {
     display: grid;
     grid-template-columns: 1fr 1fr
+}
+
+.five-gap {
+    gap: 5px
+}
+
+.short-input {
+    width: 90px
+}
+
+.class-sett-btn {
+    border-radius: 4px;
+    background: rgb(14, 108, 14);
+    color: white;
 }
 
 .config-buttons {
