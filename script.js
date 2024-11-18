@@ -100,9 +100,8 @@ function shiftClassMenu(n) {
     }
 }
 
-populateClassOptions()
 if (allConfigs[classIndex]) {
-    switchClass(classIndex)
+    populateClassButtons()
 }
 
 //localStorage.setItem("desk_configs", "")
@@ -340,15 +339,11 @@ function saveClass() {
         allConfigs.push(classDict)
         localStorage.setItem("desk_configs", JSON.stringify(allConfigs))
 
-        populateConfigButtons(configIndex)
+        populateClassButtons()
+        populateConfigButtons(allConfigs[thisIndex].class_name)
 
-        // create dropdown menu options
-
-        let newOption = document.createElement('option')
-        newOption.value = configIndex
-        newOption.innerText = currentClass
-
-        classSelect.append(newOption)
+        shiftClassMenu(1)
+        nameClass.value = ''
     }
 }
 
@@ -396,27 +391,9 @@ function saveConfig(str) {
 
         configIndex = allConfigs[classIndex].configs.length
 
-        populateConfigButtons(classIndex)
+        populateConfigButtons(allConfigs[classIndex].class_name)
 
         nameConfig.value = null
-    }
-}
-
-function populateClassOptions() {
-    classSelect.innerHTML = ''
-    
-    noneOption = document.createElement('option')
-    noneOption.value = null
-    noneOption.innerText = 'none'
-
-    classSelect.append(noneOption)
-
-    for (let n = 0; n < allConfigs.length; n++) {
-        let newOption = document.createElement('option')
-        newOption.value = n
-        newOption.innerText = allConfigs[n].class_name
-
-        classSelect.append(newOption)
     }
 }
 
@@ -426,7 +403,7 @@ function populateDesks(n, tot, col) {
     let w // width in columns
 
 
-    if (n) {
+    if (!(n == null)) {
         t = allConfigs[n].num_and_col[0]
         w = allConfigs[n].num_and_col[1]
     } else {
@@ -434,6 +411,8 @@ function populateDesks(n, tot, col) {
         w = col
     }
     
+    console.log(n, t, w)
+
     for (let i = 0; i < t; i++) {
         newDesk = document.createElement('div')
         newDesk.classList.add('desk')
@@ -452,41 +431,118 @@ function populateDesks(n, tot, col) {
     }
 }
 
-function populateConfigButtons(n) {
+function populateClassButtons() {
+    classButtons.innerHTML = ''
+
+    for (let i=0; i< allConfigs.length; i++) {
+        newDiv = document.createElement('div')
+        newDiv.classList.add('btns-wrap')
+        
+        newButton = document.createElement('button')
+        newButton.setAttribute("onclick", "switchClass(" + allConfigs[i].class_name + ")")
+        newButton.innerText = allConfigs[i].class_name
+        newButton.classList += 'med-btn left-btn'
+        
+
+        miniDelete = document.createElement('button')
+        miniDelete.setAttribute("onclick", "deleteClass(" + allConfigs[i].class_name + ")")
+        miniDelete.classList += 'mini-btn right-btn'
+        miniDelete.innerText = "X"
+
+        newDiv.append(newButton)
+        newDiv.append(miniDelete)
+
+        classButtons.append(newDiv)
+    }
+}
+
+function switchClass(classStr) {
+    let thisIndex = 0
+
+    for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
+        thisIndex ++
+    }
+
+    classTab.innerText = classStr
+    populateDesks(thisIndex)
+    populateConfigButtons(allConfigs[thisIndex].class_name)
+
+    shiftClassMenu(1)
+}
+
+function deleteClass(classStr) {
+    let thisIndex = 0
+
+    for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
+        thisIndex ++
+    }
+    
+    allConfigs.splice(thisIndex, 1)
+    classButtons.children[thisIndex].remove()
+
+    localStorage.setItem('desk_configs', JSON.stringify(allConfigs))
+}
+
+function populateConfigButtons(classStr) {
     configButtons.innerHTML = ''
-    if (allConfigs[n]) {
-        let configArr = allConfigs[n].configs
+    
+    let thisIndex = 0
+
+    for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
+        thisIndex ++
+    }
+    
+    if (allConfigs[thisIndex]) {
+        let configArr = allConfigs[thisIndex].configs
     
         for (let i=0; i< configArr.length; i++) {
+            newDiv = document.createElement('div')
+            newDiv.classList.add('btns-wrap')
+            
             newButton = document.createElement('button')
-            newButton.setAttribute("onclick", "switchConfig(" + i + ")")
+            newButton.setAttribute("onclick", "switchConfig('" + classStr + "', '" + configArr[i].name + "')")
             newButton.innerText = configArr[i].name
+            newButton.classList += 'med-btn left-btn'
+
+            miniDelete = document.createElement('button')
+            miniDelete.setAttribute("onclick", "deleteConfig('" + classStr + "', '" + configArr[i].name + "')")
+            miniDelete.classList += 'mini-btn right-btn'
+            miniDelete.innerText = "X"
+
+            newDiv.append(newButton)
+            newDiv.append(miniDelete)
     
-            configButtons.append(newButton)
+            configButtons.append(newDiv)
         }
     }
 }
 
-function switchClass(n) {
-    classIndex = n
-    classTab.innerText = allConfigs[n].class_name
-    
-    populateDesks(n)
-    populateConfigButtons(n)
-}
-
-function switchConfig(n) {
+function switchConfig(classStr, configStr) {
     allDesks = Array.from(document.getElementsByClassName('desk'))
-    configIndex = n
+    let gradeIndex = 0
+    let conIndex = 0
+
+    for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
+        gradeIndex ++
+    }
+
+    for (n = 0; !(allConfigs[gradeIndex].configs[n].name == configStr); n++) {
+        conIndex ++
+    }
 
     i = 0
     allDesks.forEach(element => {
         
-        element.style.left = allConfigs[classIndex].configs[configIndex].positions[i][0] + "px"
-        element.style.top  = allConfigs[classIndex].configs[configIndex].positions[i][1] + "px"
+        element.style.left = allConfigs[gradeIndex].configs[conIndex].positions[i][0] + "px"
+        element.style.top  = allConfigs[gradeIndex].configs[conIndex].positions[i][1] + "px"
 
         i++
     })
+}
+
+function deleteConfig(classNum, configNum) {
+    allConfigs[classNum].configs.splice(configNum, 1)
+    configButtons.children[configNum].remove()
 }
 
 function clearConfigs(int) {
@@ -494,7 +550,7 @@ function clearConfigs(int) {
         allConfigs[classIndex].configs = [allConfigs[classIndex].configs[0]]
         localStorage.setItem('desk_configs', JSON.stringify(allConfigs))
     }
-    populateConfigButtons(0)
+    populateConfigButtons(null)
 }
 
 function shuffleDesks() {

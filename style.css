@@ -47,6 +47,7 @@ body {
     position: fixed;
     bottom: 0;
     transition: bottom 0.5s;
+    display: flex
 }
 .class-settings.down {
     bottom: -240px
@@ -55,7 +56,7 @@ body {
 .class-tab {
     position: absolute;
     height: calc(8vw);
-    min-width: calc(8vw + 20px);
+    min-width: calc(min(8vh, 8vw) + 20px);
     top: calc(-8vw - 20px);
     left: 0px;
     background: lightgreen;
@@ -63,7 +64,7 @@ body {
     border-top-left-radius: 10px;
     text-align: center;
     padding: 10px;
-    font-size: 8vw
+    font-size: min(8vh, 8vw)
 }
 
 .class-no-tab {
@@ -91,9 +92,42 @@ body {
     flex-direction: column
 }
 
-.class-buttons-wrap {
+.two-grid-col {
     display: grid;
     grid-template-columns: 1fr 1fr
+}
+
+.config-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin: 5px 0px;
+}
+
+.btns-wrap {
+    display: flex;
+}
+
+.med-btn {
+    flex: 1;
+    background: rgb(180, 247, 180)
+}
+
+.mini-btn {
+    background: maroon;
+    color: white
+}
+
+.left-btn {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-right: none;
+}
+
+.right-btn {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-left: none;
 }
 
 .timer-layer {

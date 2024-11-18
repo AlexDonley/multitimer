@@ -19,12 +19,7 @@
         <div class="class-no-tab">
             <div class="class-scroll-menu" id="classScrollMenu">
                 <div class="save-class-wrap">
-                    <label for="classSelect">Pick a class:</label>
-                    <select name="class_names" id="classSelect" onchange="switchClass(document.getElementsByTagName('select')[0].value)">
-                        <option value="">none</option>
-                    </select>
-                        <br>
-                    <div> or save a new class:</div>
+                    <div class="class-buttons two-grid-col"  id="classButtons"></div>
                         <br>
                     <div class="studs-cols-wrap">
                         <label for="studentNum">Students:</label>
@@ -36,15 +31,12 @@
                     <button onclick="saveClass()">SAVE CLASS</button>
                 </div>
                 <div class="save-config-wrap">
-                    <div>
-                        Drag desks to configure them.
-                    </div>
-                    <label for="nameConfig">Name and save below:</label>
+                    <label for="nameConfig">Drag desks and save:</label>
                         <br>
                     <input type="text" id="nameConfig">
                     <button onclick="saveConfig(nameConfig.value)">SAVE CONFIG</button>
                         <br>
-                    <div id="configButtons"></div>
+                    <div class="config-buttons" id="configButtons"></div>
                     <button onclick="shuffleDesks()">SHUFFLE</button> <button onclick="toggleDeskAppearance()">CIRCLE</button> <button onclick="clearConfigs(-1)">CLEAR ALL</button> 
                 </div>
                 <div class="class-info-wrap">
@@ -52,9 +44,9 @@
                 </div>
             </div>
             <div class="class-bottom-controls">
-                <div class="class-buttons-wrap">
-                    <button onclick="shiftClassMenu(-1)">◀</button>
-                    <button onclick="shiftClassMenu(1)">▶</button>
+                <div class="lr-wrap two-grid-col">
+                    <button class="left-btn" onclick="shiftClassMenu(-1)">◀</button>
+                    <button class="right-btn" onclick="shiftClassMenu(1)">▶</button>
                 </div>
                 <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
             </div>
