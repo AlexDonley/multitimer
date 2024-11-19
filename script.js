@@ -1,8 +1,6 @@
 // TO DO
 // desk modes: colored teams
 // center the desks
-// check if user wants to overwrite existing configs or not
-// timer functions: count up, count down (set time vs. to something o'clock)
 // timer fullscreen, subtimer, and split functions
 // create auto class timeline with variable options for hard and soft time limits
 // add grade / scoring / progress chart
@@ -17,6 +15,7 @@ const columnNum         = document.getElementById('columnNum')
 const classSelect       = document.getElementById('classSelect')
 const nameConfig        = document.getElementById('nameConfig')
 const configButtons     = document.getElementById('configButtons')
+const classInfo         = document.getElementById('classInfo')
 const dotGapSlider      = document.getElementById('dotGapSlider')
 const timerLayer        = document.getElementById('timerLayer')
 const globalTimer       = document.getElementById('globalTimer')
@@ -38,33 +37,6 @@ const months = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December']
 
 const alarmSound  = new Audio('./sfx/alarm.mp3')
-
-const classes = {
-    '201' : [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-        13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
-    ],
-    '202' : [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-        13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24
-    ],
-    '501': [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
-        13, 14, 16, 17, 18, 19, 20, 21, 22, 23
-    ],
-    '502': [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
-    ],
-    '601': [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-        12, 13, 14, 16, 17, 18, 19, 20, 21
-    ],
-    '602': [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-        12, 13, 15, 14, 16, 17, 18, 19, 20, 21
-    ]
-}
 
 let gap = 50
 let studentCount = 20
@@ -94,7 +66,7 @@ let timerCount = 0
 let classMenuPos = 0
 
 function shiftClassMenu(n) {
-    if (classMenuPos + n > -1 && classMenuPos + n < 3) {
+    if (classMenuPos + n > -1 && classMenuPos + n < 4) {
         classMenuPos += n
         classScrollMenu.style.transform = "translateX(" + classMenuPos * -240 + "px)"
     }
@@ -142,6 +114,177 @@ function populateGridDots(n, screenW, screenH) {
     // console.log(columnSpacingStr)
     gridBackground.style.gridTemplateColumns = columnSpacingStr
     gridBackground.style.gridTemplateRows = rowSpacingStr
+}
+
+function populateDesks(n, tot, col) {
+    deskLayer.innerHTML = ''
+    let t // total
+    let w // width in columns
+
+
+    if (!(n == null)) {
+        t = allConfigs[n].num_and_col[0]
+        w = allConfigs[n].num_and_col[1]
+    } else {
+        t = tot
+        w = col
+    }
+    
+    console.log(n, t, w)
+
+    for (let i = 0; i < t; i++) {
+        newDesk = document.createElement('div')
+        newDesk.classList.add('desk')
+        newDesk.style.height = (2 * gap) + "px"
+        newDesk.style.width = (2 * gap) + "px"
+        newDesk.style.lineHeight = (2 * gap) + "px"
+        // newDesk.style.fontSize = (2 * gap - 30) + "px"
+        newDesk.style.zIndex = -1
+        newDesk.innerText = i + 1
+
+        newDesk.style.top = (Math.floor((i) / w) * gap * 3) + gap / 2 + "px"
+        newDesk.style.left = (i % w) * gap * 3 + gap / 2 + "px"
+
+        deskLayer.append(newDesk)
+        dragInit(newDesk)
+    }
+
+    populateInfoOptions(t)
+}
+
+function populateClassButtons() {
+    classButtons.innerHTML = ''
+
+    for (let i=0; i< allConfigs.length; i++) {
+        newDiv = document.createElement('div')
+        newDiv.classList.add('btns-wrap')
+        
+        newButton = document.createElement('button')
+        newButton.setAttribute("onclick", "switchClass('" + allConfigs[i].class_name + "')")
+        newButton.innerText = allConfigs[i].class_name
+        newButton.classList += 'med-btn left-btn'
+        
+
+        miniDelete = document.createElement('button')
+        miniDelete.setAttribute("onclick", "deleteClass('" + allConfigs[i].class_name + "')")
+        miniDelete.classList += 'mini-btn right-btn'
+        miniDelete.innerText = "X"
+
+        newDiv.append(newButton)
+        newDiv.append(miniDelete)
+
+        classButtons.append(newDiv)
+    }
+
+    configIndex = 0
+}
+
+function populateInfoOptions(n) {
+    classInfo.innerText = ''
+    
+    for (let i = 1; i <= n; i++) {
+        appendInfoOption(i)
+    }
+}
+
+function appendInfoOption(index) {
+    numStr = "num_" + index
+    nameStr = "name_" + index
+    
+    newCheckbox = document.createElement('input')
+    newCheckbox.setAttribute("type", "checkbox")
+    newCheckbox.setAttribute("id", numStr)
+    newCheckbox.setAttribute("name", numStr)
+    newCheckbox.setAttribute("onchange", "bumpInfo('" + numStr + "')")
+    newCheckbox.checked = true
+
+    newLabel = document.createElement('label')
+    newLabel.setAttribute("for", numStr)
+    newLabel.innerText = index
+
+    newTextIn = document.createElement('input')
+    newTextIn.setAttribute("type", "text")
+    newTextIn.setAttribute("id", nameStr)
+    newTextIn.classList.add('short-input')
+
+    classInfo.append(newCheckbox)
+    classInfo.append(newLabel)
+    classInfo.append(newTextIn)
+}
+
+function bumpInfo(str) {
+    thisCheckbox = document.getElementById(str)
+    thisTextInput = document.getElementById("name_" + str.substring(4))
+
+    if (thisCheckbox.checked) {
+        thisTextInput.disabled = false
+
+        for (let i=0; i<3; i++) {
+            classInfo.children[classInfo.children.length - 1].remove()
+        }
+    } else {
+        thisTextInput.disabled = true
+        thisTextInput.value = ''
+        appendInfoOption(1 + classInfo.children.length / 3)
+    }
+}
+
+function assignInfo() {
+    infoArray = []
+
+    for (let i=0; i < classInfo.children.length - 1; i += 3) {
+
+        if (classInfo.children[i].checked) {
+            entryObj = {
+                "num" : classInfo.children[i + 1].innerText,
+                "name" : classInfo.children[i + 2].value,
+            }
+
+            infoArray.push(entryObj)
+        }
+    }
+
+    allConfigs[classIndex].student_info = infoArray
+    console.log(allConfigs)
+    writeConfigsToLocal()
+    return infoArray
+}
+
+function swapDeskLabels(mode) {
+    allDesks =Array.from(document.getElementsByClassName('desk'))
+    
+    if (mode == 'nums') {
+
+        n = 0
+        allDesks.forEach(element => {
+            element.innerText = allConfigs[classIndex].student_info[n].num
+            element.classList.remove('small-text')
+
+            n++
+        })
+
+    } else if (mode == 'names') {
+
+        n = 0
+        allDesks.forEach(element => {
+            element.innerText = allConfigs[classIndex].student_info[n].name
+            element.classList.add('small-text')
+    
+            n++
+        })
+
+    } else if (mode == 'both') {
+
+        n = 0
+        allDesks.forEach(element => {
+            element.innerText = allConfigs[classIndex].student_info[n].num + " " + 
+                                allConfigs[classIndex].student_info[n].name
+            element.classList.add('small-text')
+    
+            n++
+        })
+
+    }
 }
 
 function checkPixels (n) {
@@ -450,67 +593,6 @@ function saveConfig(str) {
         populateConfigButtons(allConfigs[classIndex].class_name)
         nameConfig.value = null
     }
-}
-
-function populateDesks(n, tot, col) {
-    deskLayer.innerHTML = ''
-    let t // total
-    let w // width in columns
-
-
-    if (!(n == null)) {
-        t = allConfigs[n].num_and_col[0]
-        w = allConfigs[n].num_and_col[1]
-    } else {
-        t = tot
-        w = col
-    }
-    
-    console.log(n, t, w)
-
-    for (let i = 0; i < t; i++) {
-        newDesk = document.createElement('div')
-        newDesk.classList.add('desk')
-        newDesk.style.height = (2 * gap) + "px"
-        newDesk.style.width = (2 * gap) + "px"
-        newDesk.style.lineHeight = (2 * gap) + "px"
-        newDesk.style.fontSize = (2 * gap - 30) + "px"
-        newDesk.style.zIndex = -1
-        newDesk.innerText = i + 1
-
-        newDesk.style.top = (Math.floor((i) / w) * gap * 3) + gap / 2 + "px"
-        newDesk.style.left = (i % w) * gap * 3 + gap / 2 + "px"
-
-        deskLayer.append(newDesk)
-        dragInit(newDesk)
-    }
-}
-
-function populateClassButtons() {
-    classButtons.innerHTML = ''
-
-    for (let i=0; i< allConfigs.length; i++) {
-        newDiv = document.createElement('div')
-        newDiv.classList.add('btns-wrap')
-        
-        newButton = document.createElement('button')
-        newButton.setAttribute("onclick", "switchClass(" + allConfigs[i].class_name + ")")
-        newButton.innerText = allConfigs[i].class_name
-        newButton.classList += 'med-btn left-btn'
-        
-
-        miniDelete = document.createElement('button')
-        miniDelete.setAttribute("onclick", "deleteClass(" + allConfigs[i].class_name + ")")
-        miniDelete.classList += 'mini-btn right-btn'
-        miniDelete.innerText = "X"
-
-        newDiv.append(newButton)
-        newDiv.append(miniDelete)
-
-        classButtons.append(newDiv)
-    }
-
-    configIndex = 0
 }
 
 function switchClass(classStr) {

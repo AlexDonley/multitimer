@@ -40,12 +40,19 @@
                     <div class="config-buttons" id="configButtons"></div>
                     <div class="two-grid-col">
                         <button class="class-sett-btn" onclick="shuffleDesks()">SHUFFLE</button> 
-                        <button class="class-sett-btn" onclick="toggleDeskAppearance()">CIRCLE</button> 
                         <button class="class-sett-btn" onclick="clearConfigs(-1)">CLEAR ALL</button> 
                     </div>
                 </div>
                 <div class="class-info-wrap">
-                    To be created: means of saving student numbers and names to local storage
+                    <button class="class-sett-btn" onclick="assignInfo()">Assign</button> numbers and names:
+                    <div class="class-info" id="classInfo">
+                    </div>
+                </div>
+                <div class="swap-info-wrap">
+                    <button class="class-sett-btn" onclick="swapDeskLabels('nums')">Numbers</button>
+                    <button class="class-sett-btn" onclick="swapDeskLabels('names')">Names</button>
+                    <button class="class-sett-btn" onclick="swapDeskLabels('both')">Both</button>
+                    <button class="class-sett-btn" onclick="toggleDeskAppearance()">CIRCLE</button> 
                 </div>
             </div>
             <div class="class-bottom-controls">
