@@ -16,7 +16,8 @@ const classSelect       = document.getElementById('classSelect')
 const nameConfig        = document.getElementById('nameConfig')
 const configButtons     = document.getElementById('configButtons')
 const classInfo         = document.getElementById('classInfo')
-const dotGapSlider      = document.getElementById('dotGapSlider')
+const infoBtns          = document.getElementById('infoBtns')
+// const dotGapSlider      = document.getElementById('dotGapSlider')
 const timerLayer        = document.getElementById('timerLayer')
 const globalTimer       = document.getElementById('globalTimer')
 const timeOfDay         = document.getElementById('timeOfDay')
@@ -140,7 +141,7 @@ function populateDesks(n, tot, col) {
         newDesk.style.lineHeight = (2 * gap) + "px"
         // newDesk.style.fontSize = (2 * gap - 30) + "px"
         newDesk.style.zIndex = -1
-        newDesk.innerText = i + 1
+        // newDesk.innerText = i + 1
 
         newDesk.style.top = (Math.floor((i) / w) * gap * 3) + gap / 2 + "px"
         newDesk.style.left = (i % w) * gap * 3 + gap / 2 + "px"
@@ -607,6 +608,12 @@ function switchClass(classStr) {
     classTab.innerText = classStr
     populateDesks(thisIndex)
     populateConfigButtons(allConfigs[thisIndex].class_name)
+
+    if (allConfigs[thisIndex].student_info) {
+        infoBtns.classList.remove('hide')
+    } else {
+        infoBtns.classList.add('hide')
+    }
 
     shiftClassMenu(1)
 }
