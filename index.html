@@ -30,6 +30,11 @@
                         <button class="class-sett-btn" onclick="saveClass()">SAVE CLASS</button>
                     </div>
                 </div>
+                <div class="class-info-wrap">
+                    <button class="class-sett-btn" onclick="assignInfo()">Assign</button> numbers and names:
+                    <div class="class-info" id="classInfo">
+                    </div>
+                </div>
                 <div class="save-config-wrap">
                     <label for="nameConfig">Drag desks and save:</label>
                         <br>
@@ -43,24 +48,23 @@
                         <button class="class-sett-btn" onclick="clearConfigs(-1)">CLEAR ALL</button> 
                     </div>
                 </div>
-                <div class="class-info-wrap">
-                    <button class="class-sett-btn" onclick="assignInfo()">Assign</button> numbers and names:
-                    <div class="class-info" id="classInfo">
-                    </div>
-                </div>
                 <div class="swap-info-wrap">
-                    <button class="class-sett-btn" onclick="swapDeskLabels('nums')">Numbers</button>
-                    <button class="class-sett-btn" onclick="swapDeskLabels('names')">Names</button>
-                    <button class="class-sett-btn" onclick="swapDeskLabels('both')">Both</button>
-                    <button class="class-sett-btn" onclick="toggleDeskAppearance()">CIRCLE</button> 
+ 
                 </div>
             </div>
             <div class="class-bottom-controls">
                 <div class="lr-wrap two-grid-col">
                     <button class="left-btn" onclick="shiftClassMenu(-1)">◀</button>
                     <button class="right-btn" onclick="shiftClassMenu(1)">▶</button>
+                    
                 </div>
-                <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider">
+                <div class="two-grid-col hide" id="infoBtns">
+                    <button class="class-sett-btn" onclick="swapDeskLabels('nums')">Numbers</button>
+                    <button class="class-sett-btn" onclick="swapDeskLabels('names')">Names</button>
+                    <button class="class-sett-btn" onclick="swapDeskLabels('both')">Both</button>
+                    <button class="class-sett-btn" onclick="toggleDeskAppearance()">CIRCLE</button>
+                </div>
+                <!-- <input type="range" min="30" max="60" value="30" class="slider" id="dotGapSlider"> -->
             </div>
         </div>
     </div>
@@ -91,7 +95,7 @@
         <div class="global-timer down" id="globalTimer">
             <div class="time-of-day main" id="timeOfDay" onclick="toggleGlobalTimer()"></div>
             <div class="month-year" id="monthYear"></div>
-            <button onclick="toggleFullscreen('globalTimer')">fullscreen</button> <br>
+            <button onclick="toggleFullscreen('globalTimer')">fullscreen</button>
             <div class="timer-settings" id="timerSettings">
                 count <button onclick="toggleTimerDirection()" id="timerDirectionBtn">down from</button>
                 <button onclick="toggleTimerTarget()" id="timerTargetBtn">amount of time</button>
