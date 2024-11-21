@@ -797,14 +797,20 @@ function displayTime(bool) {
     timeOfDay.innerText = timeStr
     monthYear.innerText = weekDay + ", " + month + " " + monthDay + ", " + year
     
+    nowRaw = timeStampToSec(hour + ":" + 
+                            appendZero(minutes.toString()) + ":" + 
+                            appendZero(seconds.toString()))
+
+    console.log(nowRaw)
+
     if (!bool) {
-        updateTimers(timerObjects)
+        updateTimers(timerObjects, nowRaw)
     }
 
     return timeStampToSec(hour + ":" + appendZero(minutes) + ":" + appendZero(seconds))
 }
 
-function updateTimers(arr){
+function updateTimers(arr, now){
     if (arr.length > 0) {
         arr.forEach(timerDict => {
             timerId = timerDict.timer_id
@@ -824,13 +830,13 @@ function updateTimers(arr){
                     timerDict.sec_now += 1
                 } 
                 
-                beginTime.innerText = secToTimeStamp(timerDict.sec_start)[1]
-                targetTime.innerText = secToTimeStamp(timerDict.sec_end - 1)[1]
+                beginTime.innerText = secToTimeStamp(timerDict.sec_start + 1)[1]
+                targetTime.innerText = secToTimeStamp(timerDict.sec_end)[1]
         
                 if (timerDirect < 0) { // create countdown display
-                    mainStamp = secToTimeStamp(timerDict.sec_end - timerDict.sec_now)[1]
+                    mainStamp = secToTimeStamp(timerDict.sec_end - now)[1]
                 } else { // create countup display
-                    mainStamp = secToTimeStamp(timerDict.sec_now - timerDict.sec_start)[1]
+                    mainStamp = secToTimeStamp(now - timerDict.sec_start)[1]
                 }
                 
                 mainTime.innerText = trimTimeStamp(mainStamp, timerDict.init_length)
