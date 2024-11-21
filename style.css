@@ -281,13 +281,10 @@ body {
 }
 
 .time-of-day {
-    font-size: 20pt;
+    font-size: min(8vh, 8vw)
 }
 .month-year {
     font-size: 20pt;
-}
-.main {
-    font-size: 8vw;
 }
 
 .down {
