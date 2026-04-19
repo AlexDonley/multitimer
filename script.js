@@ -53,9 +53,9 @@ let viewHnum
 let allConfigs = []
 let timerObjects = []
 
-if (localStorage.getItem("desk_configs")) {
-    allConfigs = JSON.parse(localStorage.getItem("desk_configs"))
-}
+// if (localStorage.getItem("desk_configs")) {
+//     allConfigs = JSON.parse(localStorage.getItem("desk_configs"))
+// }
 
 let currentClass
 let classIndex = 0
@@ -142,7 +142,9 @@ async function fetchDefaultConfigs(url) {
         }
         
         console.log(`Successfully fetched ${defaultClass[0].class_name}`);
-        allConfigs.push(defaultClass);
+        allConfigs.push(defaultClass[0]);
+        console.log(allConfigs)
+
         switchClass("6th");
         swapDeskLabels('names');
         return defaultClass;
@@ -994,7 +996,7 @@ function displayTime(bool) {
                             appendZero(minutes.toString()) + ":" + 
                             appendZero(seconds.toString()))
 
-    console.log(nowRaw)
+    // console.log(nowRaw)
 
     if (!bool) {
         updateTimers(timerObjects, nowRaw)
