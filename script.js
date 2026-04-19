@@ -30,6 +30,7 @@ const timeInput         = document.getElementById('timeInput')
 const timerName         = document.getElementById('timerName')
 const pickHours         = document.getElementById('pickHours')
 const pickMinutes       = document.getElementById('pickMinutes')
+const dataLayer         = document.getElementById('dataLayer')
 
 const timerTemplate     = document.querySelector("[timer-template]")
 
@@ -65,6 +66,48 @@ let timerTarget = 'amount'
 let timerCount = 0
 
 let classMenuPos = 0
+
+async function fetchStudentProfiles(url) {
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const students = await response.json();
+        
+        if (!Array.isArray(students)) {
+            throw new Error('Fetched data is not an array');
+        }
+        
+        console.log(`Successfully fetched ${students.length} student profiles`);
+        populateData(students)
+        return students;
+        
+    } catch (error) {
+        console.error('Error fetching student profiles:', error.message);
+        throw error;
+    }
+}
+
+async function populateData(arr) {
+    arr.forEach(entry => {
+        appendData(entry.name);
+        appendData(entry.readiness);
+        appendData(entry.interests);
+        appendData(entry.learning_profile);
+    })
+}
+
+async function appendData(str) {
+    const newDiv = document.createElement('div')
+    newDiv.innerText = str
+    dataLayer.append(newDiv)
+}
+
+const preData = fetchStudentProfiles('./data/student_data.json')
+//populateData(preData)
 
 function shiftClassMenu(n) {
     if (classMenuPos + n > -1 && classMenuPos + n < 4) {

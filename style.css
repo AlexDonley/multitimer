@@ -16,6 +16,21 @@ body {
     user-select: none;
 }
 
+.data-layer {
+    position: fixed;
+    top: 10vh;
+    left: 10vw;
+    height: 80vh;
+    width: 80vw;
+    background-color: green;
+    padding: 15px;
+    border-radius: 15px;
+    color: white;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
 .one-dot {
     color: black;
     font-size: 20pt;
