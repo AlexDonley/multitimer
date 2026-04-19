@@ -83,6 +83,11 @@ async function fetchStudentProfiles(url) {
         
         console.log(`Successfully fetched ${students.length} student profiles`);
         populateData(students)
+        // console.log(groupStudents(students, 3, true, 'readiness'))
+        // console.log(groupStudents(students, 4, false, 'readiness'))
+        // console.log(groupStudents(students, 2, false, 'interests'))
+        // console.log(groupStudents(students, 4, true, 'learning_profile'))
+        // console.log(groupStudents(students, 3, false, 'learning_profile'))
         return students;
         
     } catch (error) {
@@ -98,6 +103,12 @@ async function populateData(arr) {
         appendData(entry.interests);
         appendData(entry.learning_profile);
     })
+
+    const newDiv = document.createElement('div')
+    newDiv.classList.add('data-tab')
+    newDiv.innerText = 'Show / Hide'
+    newDiv.setAttribute("onclick", "toggleData()")
+    dataLayer.append(newDiv)
 }
 
 async function appendData(str) {
@@ -106,8 +117,142 @@ async function appendData(str) {
     dataLayer.append(newDiv)
 }
 
+function toggleData() {
+    if (dataLayer.classList.contains('over-left')) {
+        dataLayer.classList.remove('over-left')
+    } else {
+        dataLayer.classList.add('over-left')
+    }
+}
+
 const preData = fetchStudentProfiles('./data/student_data.json')
-//populateData(preData)
+
+async function fetchDefaultConfigs(url) {
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const defaultClass = await response.json();
+        
+        if (!Array.isArray(defaultClass)) {
+            throw new Error('Fetched data is not an array');
+        }
+        
+        console.log(`Successfully fetched ${defaultClass[0].class_name}`);
+        allConfigs.push(defaultClass);
+        switchClass("6th");
+        swapDeskLabels('names');
+        return defaultClass;
+        
+    } catch (error) {
+        console.error('Error fetching student profiles:', error.message);
+        throw error;
+    }
+}
+
+const preConfigs = fetchDefaultConfigs('./data/default_configs.json')
+
+function groupStudents(students, groupSize, isHomogeneous, category) {
+    if (!students || students.length === 0) {
+        console.error('No student data provided');
+        return [];
+    }
+    
+    if (groupSize <= 0) {
+        console.error('Group size must be positive');
+        return [];
+    }
+    
+    // Make a copy to avoid mutating original array
+    let studentsCopy = [...students];
+    let groups = [];
+    
+    // Helper function to get category value for sorting/comparison
+    function getCategoryValue(student, category) {
+        if (category === 'readiness') {
+            return student.readiness;
+        } else if (category === 'learning_profile') {
+            return student.learning_profile;
+        } else if (category === 'interests') {
+            // For interests, use the first interest as primary sort key
+            return student.interests[0] || '';
+        }
+        return null;
+    }
+    
+    if (isHomogeneous) {
+        // HOMOGENEOUS GROUPING: Sort by category value, then group consecutive students
+        
+        // Sort students by category value
+        if (category === 'readiness') {
+            studentsCopy.sort((a, b) => a.readiness - b.readiness);
+        } else if (category === 'learning_profile') {
+            const profileOrder = { 'analytic': 1, 'creative': 2, 'practical': 3 };
+            studentsCopy.sort((a, b) => profileOrder[a.learning_profile] - profileOrder[b.learning_profile]);
+        } else if (category === 'interests') {
+            studentsCopy.sort((a, b) => {
+                const aInterest = a.interests[0] || '';
+                const bInterest = b.interests[0] || '';
+                return aInterest.localeCompare(bInterest);
+            });
+        }
+        
+        // Group into chunks of groupSize, outputting names only
+        for (let i = 0; i < studentsCopy.length; i += groupSize) {
+            const group = studentsCopy.slice(i, i + groupSize);
+            if (group.length > 0) {
+                const groupNames = group.map(student => student.name);
+                groups.push(groupNames);
+            }
+        }
+    } else {
+        // HETEROGENEOUS GROUPING: Distribute students evenly across groups
+        
+        // First, sort students by category value to ensure distribution
+        if (category === 'readiness') {
+            studentsCopy.sort((a, b) => a.readiness - b.readiness);
+        } else if (category === 'learning_profile') {
+            const profileOrder = { 'analytic': 1, 'creative': 2, 'practical': 3 };
+            studentsCopy.sort((a, b) => profileOrder[a.learning_profile] - profileOrder[b.learning_profile]);
+        } else if (category === 'interests') {
+            studentsCopy.sort((a, b) => {
+                const aInterest = a.interests[0] || '';
+                const bInterest = b.interests[0] || '';
+                return aInterest.localeCompare(bInterest);
+            });
+        }
+        
+        // Calculate number of groups needed
+        const numGroups = Math.ceil(studentsCopy.length / groupSize);
+        
+        // Initialize empty groups
+        for (let i = 0; i < numGroups; i++) {
+            groups.push([]);
+        }
+        
+        // Distribute students round-robin style
+        studentsCopy.forEach((student, index) => {
+            const groupIndex = index % numGroups;
+            groups[groupIndex].push(student.name);
+        });
+        
+        // Filter out any empty groups that might exist if groupSize > student count
+        groups = groups.filter(group => group.length > 0);
+    }
+    
+    // Log grouping results
+    console.log(`Created ${groups.length} groups using ${isHomogeneous ? 'homogeneous' : 'heterogeneous'} grouping by ${category}`);
+    groups.forEach((group, idx) => {
+        console.log(`Group ${idx + 1} (${group.length} students): ${group.join(', ')}`);
+    });
+    
+    return groups;
+}
+
+
 
 function shiftClassMenu(n) {
     if (classMenuPos + n > -1 && classMenuPos + n < 4) {
@@ -121,7 +266,12 @@ if (allConfigs[classIndex]) {
 }
 
 function writeConfigsToLocal() {
+    console.log(allConfigs)
     localStorage.setItem("desk_configs", JSON.stringify(allConfigs))
+
+    new File(["foo"], "foo.txt", {
+        type: "text/plain",
+    });
 }
 
 //localStorage.setItem("desk_configs", "")
@@ -645,7 +795,7 @@ function switchClass(classStr) {
     for (n = 0; !(allConfigs[n].class_name == classStr); n++) {
         thisIndex ++
     }
-
+    console.log("attempted to switch to " + thisIndex)
     classIndex = thisIndex
 
     classTab.innerText = classStr

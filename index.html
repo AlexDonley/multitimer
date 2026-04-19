@@ -14,9 +14,20 @@
     </div>
     <div class="data-layer" id="dataLayer">
         <div><u>Sample Students</u></div>
-        <button>Pre-assessment Readiness Score</button>
-        <button>Interests</button>
-        <button>Learning Profile</button>
+        <div class="data-head">
+            Pre-assessed Readiness
+            <button class="data-btn" onclick="switchConfig('6th', 'read_hom')">hom</button>
+            <button class="data-btn" onclick="switchConfig('6th', 'read_het')">het</button>
+        </div>
+        <div class="data-head">
+            Interests
+            <button class="data-btn" onclick="switchConfig('6th', 'int_het')">het</button>
+        </div>
+        <div class="data-head">
+            Learning Profile
+            <button class="data-btn" onclick="switchConfig('6th', 'lp_hom')">hom</button>
+            <button class="data-btn" onclick="switchConfig('6th', 'lp_het')">het</button>
+        </div>
     </div>
     <div class="class-settings down" id="classSettings">
         <div class="class-tab" id="classTab" onclick="toggleClassMenu()">

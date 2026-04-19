@@ -8,13 +8,13 @@
   {
     "name": "Marisol R.",
     "readiness": 6,
-    "interests": ["storytelling", "family", "collaboration"],
+    "interests": ["storytelling", "family"],
     "learning_profile": "creative"
   },
   {
     "name": "Jamal T.",
     "readiness": 8,
-    "interests": ["justice", "debate", "real-world issues"],
+    "interests": ["superheros", "debate"],
     "learning_profile": "analytic"
   },
   {
@@ -26,49 +26,49 @@
   {
     "name": "Sofia K.",
     "readiness": 7,
-    "interests": ["math", "quiet reading", "art"],
+    "interests": ["math", "art"],
     "learning_profile": "practical"
   },
   {
     "name": "Ethan W.",
     "readiness": 4,
-    "interests": ["hands-on tasks", "animals", "stability"],
+    "interests": ["animals", "sports"],
     "learning_profile": "practical"
   },
   {
     "name": "Noah B.",
     "readiness": 8,
-    "interests": ["routines", "math", "science"],
+    "interests": ["math", "science"],
     "learning_profile": "analytic"
   },
   {
     "name": "Priya S.",
     "readiness": 9,
-    "interests": ["structure", "literature", "perfection"],
+    "interests": ["books", "visual puzzles"],
     "learning_profile": "analytic"
   },
   {
     "name": "Jack L.",
     "readiness": 6,
-    "interests": ["collaboration", "Cantonese culture", "sports"],
+    "interests": ["Cantonese culture", "sports"],
     "learning_profile": "creative"
   },
   {
     "name": "Hannah J.",
     "readiness": 5,
-    "interests": ["independent work", "nature", "drawing"],
+    "interests": ["books", "nature", "drawing"],
     "learning_profile": "creative"
   },
   {
     "name": "Malik O.",
     "readiness": 7,
-    "interests": ["movement", "leadership", "discussion"],
+    "interests": ["sports", "science"],
     "learning_profile": "practical"
   },
   {
     "name": "Ruby C.",
     "readiness": 8,
-    "interests": ["writing", "creative expression", "reading"],
+    "interests": ["writing", "reading"],
     "learning_profile": "creative"
   }
 ]
